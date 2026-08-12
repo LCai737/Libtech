@@ -1,5 +1,4 @@
 # Architecture générale du GitHub
- - les fichiers nécessaires au fonctionnement du site sont dans le dossier "Libtech" (le chemin est donc Libtech/Libtech/...)
  - Les fichiers a l'extérieur sont la pour être transférés entre les différents ordinateurs
  - le fichier "A faire" est une liste de suggestion pour améliorer le site. Il a servi au cour de l'année entre nous mais nous permet aussi de vous communiquer les problèmes que nous n'avons pas pu résoudre.
 
