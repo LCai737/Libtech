@@ -366,6 +366,86 @@ main {
     padding: 16px 22px;
 }
 
+.contact-card {
+    margin: 20px 22px 40px;
+    padding: 40px 24px;
+    border-radius: 12px;
+    background: #315a77;
+    color: #fff;
+}
+
+.contact-card h3 {
+    margin-top: 0;
+}
+
+.contact-card p {
+    max-width: 420px;
+    line-height: 1.6;
+}
+
+.contact-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.about-highlight {
+    margin: 0 22px 32px;
+    padding: 24px 22px 32px;
+    border-radius: 16px;
+    background: #175b67;
+    color: #fff;
+}
+
+.about-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.about-columns h3 {
+    margin-top: 0;
+}
+
+.about-columns p {
+    line-height: 1.6;
+}
+
+.about-team {
+    padding: 40px 22px 48px;
+    background: #165c6f;
+    color: #fff;
+}
+
+.about-team section {
+    max-width: 720px;
+    margin: 0 auto 32px;
+}
+
+.about-team section:last-child {
+    margin-bottom: 0;
+}
+
+.legal-card {
+    margin: 12px 0 20px;
+    padding: 18px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+@media (max-width: 700px) {
+    .about-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Grille principale de la fiche (description + image / mĆ©tadonnĆ©es) */
 .sheet {
     display: grid;
