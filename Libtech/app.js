@@ -54,14 +54,15 @@
             nav_submit: 'Soumettre',
             nav_about: 'À propos',
             nav_contact: 'Contact',
-            footer_navigation: 'Navigation',
             footer_contact: 'Nous contacter',
             footer_resources: 'Ressources',
             footer_mentions: 'Mentions légales',
             footer_privacy: 'Politiques de confidentialité',
             footer_sitemap: 'Plan du site',
             search_global: 'Rechercher…',
-            back_to_top: '↑ Retour en haut',
+            back_to_top: '↑ Retour haut',
+            theme_enable_dark: 'Activer le mode sombre',
+            theme_enable_light: 'Activer le mode clair',
         },
         en: {
             nav_home: 'Home',
@@ -69,7 +70,6 @@
             nav_submit: 'Submit',
             nav_about: 'About',
             nav_contact: 'Contact',
-            footer_navigation: 'Navigation',
             footer_contact: 'Contact us',
             footer_resources: 'Resources',
             footer_mentions: 'Legal notice',
@@ -77,6 +77,8 @@
             footer_sitemap: 'Site map',
             search_global: 'Search…',
             back_to_top: '↑ Back to top',
+            theme_enable_dark: 'Enable dark mode',
+            theme_enable_light: 'Enable light mode',
         },
     };
 
@@ -95,7 +97,33 @@
             const val = dict[key];
             if (val) el.placeholder = val;
         });
+
+        updateThemeToggle();
     }
+
+    // Met à jour l'icône et le libellé accessible du bouton selon le thème et la langue actifs.
+    function updateThemeToggle() {
+        const themeToggle = $('#themeToggle');
+        const isDark = document.documentElement.dataset.theme === 'dark';
+        const dict = UI_STRINGS[currentLang] || UI_STRINGS.fr;
+        const label = isDark ? dict.theme_enable_light : dict.theme_enable_dark;
+
+        if (!themeToggle) return;
+        themeToggle.textContent = isDark ? '☀' : '☾';
+        themeToggle.setAttribute('aria-label', label);
+        themeToggle.title = label;
+    }
+
+    const savedTheme = localStorage.getItem('libtechTheme') === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = savedTheme;
+    updateThemeToggle();
+
+    $('#themeToggle')?.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = nextTheme;
+        localStorage.setItem('libtechTheme', nextTheme);
+        updateThemeToggle();
+    });
 
     function renderTemplate(name) {
         const template = document.getElementById(`view-${name}`);
@@ -125,7 +153,35 @@
         'Prix',
         'Localisation',
     ];
-    let activeTokens = new Map(FACET_LABELS.map((label) => [label, new Set()]));
+    // Restaure les choix des facettes après un rechargement, avec une sélection vide si les données enregistrées sont invalides.
+    function restoreActiveTokens() {
+        // Prépare une sélection vide pour chaque catégorie si aucune préférence n'est disponible.
+        const emptyTokens = () => new Map(FACET_LABELS.map((label) => [label, new Set()]));
+        const savedTokens = localStorage.getItem('libtechActiveTokens');
+        if (!savedTokens) return emptyTokens();
+
+        let parsedTokens;
+        try {
+            parsedTokens = JSON.parse(savedTokens);
+        } catch (error) {
+            console.error('Impossible de restaurer les filtres enregistrés.', error);
+            return emptyTokens();
+        }
+
+        if (!parsedTokens || typeof parsedTokens !== 'object' || Array.isArray(parsedTokens)) {
+            console.error('Les filtres enregistrés ont un format invalide.');
+            return emptyTokens();
+        }
+
+        return new Map(FACET_LABELS.map((label) => [
+            label,
+            new Set(Array.isArray(parsedTokens[label])
+                ? parsedTokens[label].filter((value) => typeof value === 'string')
+                : []),
+        ]));
+    }
+
+    let activeTokens = restoreActiveTokens();
 
     const PAGE_SIZE = 12;
     let currentPage = 1;
@@ -304,6 +360,16 @@
         if (!set) return;
         if (set.has(value)) set.delete(value);
         else set.add(value);
+
+        saveActiveTokens();
+    }
+
+    // Enregistre les sélections des facettes pour les restaurer au prochain affichage du répertoire.
+    function saveActiveTokens() {
+        const savedTokens = Object.fromEntries(
+            Array.from(activeTokens, ([facet, values]) => [facet, Array.from(values)])
+        );
+        localStorage.setItem('libtechActiveTokens', JSON.stringify(savedTokens));
     }
 
     function matchRow(row) {
@@ -334,6 +400,18 @@
 
         const valuesByFacet = facetValues();
         const parts = [];
+        const hasActiveFilters = Array.from(activeTokens.values()).some((set) => set.size > 0);
+        const resetLabel = currentLang === 'en'
+            ? 'Reset all filters'
+            : 'Réinitialiser tous les filtres';
+
+        // Cette case n'est active que lorsqu'un filtre est choisi et efface alors toutes les catégories.
+        parts.push(`
+        <div class="opt facet-select-all facet-reset">
+          <input id="resetAllFilters" type="checkbox" data-reset-all-filters
+                 ${hasActiveFilters ? 'checked' : ''} ${hasActiveFilters ? '' : 'disabled'}>
+          <label for="resetAllFilters">${resetLabel}</label>
+        </div>`);
 
         for (const f of facetDefs()) {
             const values = valuesByFacet[f.label] || [];
@@ -341,10 +419,19 @@
 
             const isExpanded = expandedFacets.has(f.label);
             const max = isExpanded ? values.length : 6;
+            // Cette case est cochée si la catégorie contient des sélections ; la décocher les efface toutes.
+            const selectAllLabel = currentLang === 'en' ? 'Deselect all' : 'Tout décocher';
 
             parts.push(`
         <div class="facet">
           <h4>${esc(f.label)}</h4>
+          <div class="opt facet-select-all">
+            <input id="facet-${slug(f.label)}-all" type="checkbox"
+                   data-select-all-label="${esc(f.label)}"
+                   ${set.size ? 'checked' : ''}
+                   ${set.size ? '' : 'disabled'}>
+            <label for="facet-${slug(f.label)}-all">${selectAllLabel}</label>
+          </div>
           ${values
                     .slice(0, max)
                     .map((val) => {
@@ -369,6 +456,32 @@
         }
 
         facetRoot.innerHTML = parts.join('');
+
+        facetRoot
+            .querySelectorAll('input[type="checkbox"][data-reset-all-filters]')
+            .forEach((el) => {
+                el.addEventListener('change', () => {
+                    activeTokens.forEach((set) => set.clear());
+                    saveActiveTokens();
+                    currentPage = 1;
+                    applyFiltersAndRenderCards();
+                });
+            });
+
+        facetRoot
+            .querySelectorAll('input[type="checkbox"][data-select-all-label]')
+            .forEach((el) => {
+                const facetLabel = el.getAttribute('data-select-all-label');
+                const set = activeTokens.get(facetLabel);
+
+                el.addEventListener('change', () => {
+                    if (!set) return;
+                    set.clear();
+                    saveActiveTokens();
+                    currentPage = 1;
+                    applyFiltersAndRenderCards();
+                });
+            });
 
         facetRoot
             .querySelectorAll('input[type="checkbox"][data-facet-label]')
@@ -544,6 +657,8 @@
     }
     function viewRepertoire() {
         const isEn = currentLang === 'en';
+        // Récupère la préférence d'affichage pour garder les filtres visibles ou masqués entre deux visites.
+        const filtersVisible = localStorage.getItem('libtechFiltersVisible') === 'true';
 
         const toggleLabelShow = isEn ? '☰ Show filters' : '☰ Afficher les filtres';
         const toggleLabelHide = isEn ? '✕ Hide filters' : '✕ Masquer les filtres';
@@ -553,11 +668,11 @@
         $('#page').innerHTML = `
       <section class="page">
         <div class="repo-topbar">
-          <button id="toggleFilters" class="filters-toggle">${esc(toggleLabelShow)}</button>
+          <button id="toggleFilters" class="filters-toggle">${esc(filtersVisible ? toggleLabelHide : toggleLabelShow)}</button>
           <span class="pill" id="count" aria-live="polite">0</span>
         </div>
-        <div class="repo-layout no-filters" id="repoLayout">
-          <aside class="sidebar hidden" id="facetRoot" aria-label="Filtres"></aside>
+        <div class="repo-layout ${filtersVisible ? 'with-filters' : 'no-filters'}" id="repoLayout">
+          <aside class="sidebar${filtersVisible ? '' : ' hidden'}" id="facetRoot" aria-label="Filtres"></aside>
           <div>
             <div class="grid" id="gridRoot"></div>
             <div class="pagination" id="pagination">
@@ -580,6 +695,8 @@
                 repoLayout.classList.toggle('no-filters', isHidden);
                 repoLayout.classList.toggle('with-filters', !isHidden);
                 toggleFilters.textContent = isHidden ? toggleLabelShow : toggleLabelHide;
+                // Mémorise l'état choisi afin de le restaurer après actualisation ou retour d'une fiche.
+                localStorage.setItem('libtechFiltersVisible', String(!isHidden));
             });
         }
 
@@ -789,7 +906,35 @@
         route();
     }
 
-    window.addEventListener('hashchange', route);
+    // Ramène progressivement la fenêtre en haut lorsqu'une navigation interne change de page.
+    function scrollToPageTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('click', (event) => {
+        const link = event.target instanceof Element
+            ? event.target.closest('a[href^="#/"]')
+            : null;
+        if (
+            !link ||
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            link.target === '_blank'
+        ) {
+            return;
+        }
+
+        scrollToPageTop();
+    });
+
+    window.addEventListener('hashchange', () => {
+        scrollToPageTop();
+        route();
+    });
 
     // ------------------------------------------------------------
     // 10. Comportements globaux
@@ -800,6 +945,19 @@
             if (location.hash.startsWith('#/repertoire')) {
                 currentPage = 1;
                 applyFiltersAndRenderCards();
+            }
+        });
+
+        // Entrée lance la recherche depuis n'importe quelle page et ouvre le répertoire si nécessaire.
+        qInput.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+
+            e.preventDefault();
+            if (location.hash === '#/repertoire') {
+                currentPage = 1;
+                applyFiltersAndRenderCards();
+            } else {
+                location.hash = '#/repertoire';
             }
         });
     }
@@ -826,34 +984,27 @@
         applyTranslations();
     }
     function applyFontChoice(choice) {
-        let fs = 'clamp(14px, 1.6vw, 16px)';
-        let fsSm = 'clamp(12px, 1.2vw, 14px)';
-
-        if (choice === 'grand') {
-            fs = 'clamp(16px, 1.9vw, 18px)';
-            fsSm = 'clamp(14px, 1.5vw, 16px)';
-        } else if (choice === 'très grand') {
-            fs = 'clamp(18px, 2.2vw, 20px)';
-            fsSm = 'clamp(16px, 1.8vw, 18px)';
-        }
-
-        const root = document.documentElement;
-        root.style.setProperty('--fs', fs);
-        root.style.setProperty('--fs-sm', fsSm);
+        const fontScale = {
+            normal: '100%',
+            grand: '112.5%',
+            'très grand': '125%',
+        };
+        document.documentElement.style.fontSize = fontScale[choice] || fontScale.normal;
     }
 
-    // Font size selector (AAA)
-    // Font size selector (AAA) – change CSS variables --fs / --fs-sm
+    // Le sélecteur redimensionne la racine pour appliquer l'échelle à toutes les tailles exprimées en rem.
     const fontSelect = $('#font');
     if (fontSelect) {
-        const savedChoice = localStorage.getItem('libtechFontChoice') || 'normal';
+        const validChoices = ['normal', 'grand', 'très grand'];
+        const storedChoice = localStorage.getItem('libtechFontChoice');
+        const savedChoice = validChoices.includes(storedChoice) ? storedChoice : 'normal';
         applyFontChoice(savedChoice);
         fontSelect.value = savedChoice;
 
         fontSelect.addEventListener('change', () => {
-            const val = fontSelect.value; // "normal" | "grand" | "très grand"
-            applyFontChoice(val);
-            localStorage.setItem('libtechFontChoice', val);
+            if (!validChoices.includes(fontSelect.value)) return;
+            applyFontChoice(fontSelect.value);
+            localStorage.setItem('libtechFontChoice', fontSelect.value);
         });
     }
 
@@ -861,10 +1012,21 @@
 
     const backToTopLink = document.querySelector('.footer-top-link');
     if (backToTopLink) {
+        // Affiche le bouton après défilement et le retire aussi de la navigation clavier lorsqu'il est caché.
+        const updateBackToTopVisibility = () => {
+            const isVisible = window.scrollY > 200;
+            backToTopLink.classList.toggle('is-visible', isVisible);
+            backToTopLink.setAttribute('aria-hidden', String(!isVisible));
+            backToTopLink.tabIndex = isVisible ? 0 : -1;
+        };
+
         backToTopLink.addEventListener('click', (e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        window.addEventListener('scroll', updateBackToTopVisibility, { passive: true });
+        updateBackToTopVisibility();
     }
 
     // ------------------------------------------------------------

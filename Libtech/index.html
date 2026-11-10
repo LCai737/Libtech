@@ -38,17 +38,15 @@
                     <option value="en">English</option>
                 </select>
 
-                <select id="font" class="select" title="Taille du texte" aria-label="Taille du texte">
-                    <option value="normal" selected>
-                        <span style="font-size:16px;">AAA</span>
-                    </option>
-                    <option value="grand">
-                        <span style="font-size:24px;">AAA</span>
-                    </option>
-                    <option value="très grand">
-                        <span style="font-size:32px;">AAA</span>
-                    </option>
+                <select id="font" class="select font-size-select" title="Taille du texte"
+                    aria-label="Taille du texte">
+                    <option value="normal" selected>A</option>
+                    <option value="grand">A+</option>
+                    <option value="très grand">A++</option>
                 </select>
+
+                <button id="themeToggle" class="theme-toggle" type="button" aria-label="Activer le mode sombre"
+                    title="Activer le mode sombre">☾</button>
             </div>
         </div>
     </header>
@@ -72,20 +70,11 @@
                         Politiques de confidentialité
                     </a>
                 </li>
-                <li>
-                    <a href="#/plan-du-site" data-i18n="footer_sitemap">
-                        Plan du site
-                    </a>
-                </li>
-                <br>
-                <a class="footer-top-link" href="#top" data-i18n="back_to_top">
-                    ↑ Retour en haut
-                </a>
             </ul>
         </div>
 
         <div class="footer-section">
-            <h3 data-i18n="footer_navigation">Navigation</h3>
+            <h3 data-i18n="footer_sitemap">Plan du site</h3>
             <ul>
                 <li><a href="#/" data-i18n="nav_home">Accueil</a></li>
                 <li><a href="#/soumettre" data-i18n="nav_submit">Soumettre</a></li>
@@ -97,6 +86,10 @@
     </footer>
 
     <div class="footer-bottom">© 2025 LibTech — Université de Bordeaux</div>
+
+    <a class="footer-top-link" href="#top" data-i18n="back_to_top" aria-label="Retour haut" aria-hidden="true" tabindex="-1">
+        ↑ Retour haut
+    </a>
 
     <template id="view-home">
         <section class="page">
