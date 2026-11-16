@@ -10,29 +10,47 @@
     --border: #e3e6ef;
     --shadow: 0 16px 48px rgba(15, 23, 42, .08);
 
+
     --maxw: 1100px;
     --header: 64px;
     --sidebar: 300px;
     --safe: env(safe-area-inset-bottom, 0px);
+
 
     --radius: 14px;
     --radius-lg: 18px;
     --tap: 44px;
     --space: 16px;
 
-    --fs: clamp(14px, 1.6vw, 16px);
-    --fs-sm: clamp(12px, 1.2vw, 14px);
+
+    --fs: 1rem;
+    --fs-sm: 0.875rem;
 }
+
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #111827;
+    --panel: #1f2937;
+    --ink: #f3f4f6;
+    --muted: #aab4c3;
+    --accent: #60a5fa;
+    --border: #374151;
+    --shadow: 0 16px 48px rgba(0, 0, 0, .3);
+}
+
 
 /* Reset lĆ©ger / base typographique */
 * {
     box-sizing: border-box;
 }
 
+
 html,
 body {
     height: 100%;
 }
+
 
 body {
     margin: 0;
@@ -41,21 +59,25 @@ body {
     font: var(--fs)/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial;
 }
 
+
 a {
     color: inherit;
     text-decoration: none;
 }
+
 
 img {
     max-width: 100%;
     display: block;
 }
 
+
 input,
 select,
 button {
     font: inherit;
 }
+
 
 /* ===============================
    BOUTONS & CHAMPS GĆ‰NĆ‰RIQUES
@@ -73,18 +95,22 @@ button {
     cursor: pointer;
 }
 
+
 .btn:hover {
     border-color: #cdd4e2;
 }
+
 
 /* Lang switch: show/hide language variants */
 html[lang="fr"] .i18n-en {
     display: none;
 }
 
+
 html[lang="en"] .i18n-fr {
     display: none;
 }
+
 
 /* ===============================
    EN-TĆTE FIXE (VISIBLE PARTOUT)
@@ -101,6 +127,7 @@ header {
     z-index: 50;
 }
 
+
 /* Conteneur interne centrĆ© */
 .wrap {
     max-width: var(--maxw);
@@ -113,6 +140,7 @@ header {
     flex-wrap: wrap;
 }
 
+
 /* Logo / marque */
 .brand {
     display: flex;
@@ -121,10 +149,12 @@ header {
     font-weight: 800;
 }
 
+
 .brand img {
     height: 26px;
     width: auto;
 }
+
 
 /* ===============================
    NAVIGATION PRINCIPALE (ONGLETS)
@@ -135,6 +165,7 @@ nav.topnav {
     flex-wrap: nowrap;
 }
 
+
 .navlink {
     padding: 5px 5px;
     border-radius: 12px;
@@ -143,15 +174,18 @@ nav.topnav {
     align-items: center;
 }
 
+
 .navlink[aria-current="page"] {
     background: #eaf1ff;
     color: #2563eb;
 }
 
+
 /* Espace flexible pour pousser la toolbar Ć  droite */
 .spacer {
     flex: 1;
 }
+
 
 /* ===============================
    OUTILS Dā€™EN-TĆTE (RECHERCHE, LANGUE, POLICE)
@@ -161,6 +195,7 @@ nav.topnav {
     gap: 8px;
     align-items: center;
 }
+
 
 .select,
 .toolbar input {
@@ -172,6 +207,102 @@ nav.topnav {
     color: var(--ink);
 }
 
+
+.font-size-select {
+    min-width: 68px;
+    padding: 0 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+.font-size-select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+
+.theme-toggle:hover {
+    border-color: var(--border);
+    background: var(--bg);
+}
+
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+
+@media (min-width: 701px) {
+    .wrap {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+
+    .brand,
+    .toolbar {
+        flex-shrink: 0;
+    }
+
+
+    .spacer {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+
+    nav.topnav {
+        flex: 0 1 auto;
+        min-width: 0;
+        gap: 2px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+
+    nav.topnav::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    .navlink {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+
+    .toolbar {
+        gap: 4px;
+    }
+
+
+    .toolbar #q {
+        width: clamp(90px, 12vw, 160px);
+    }
+
+
+    #lang {
+        max-width: 88px;
+    }
+}
+
+
 /* ===============================
    CONTENEURS DE PAGES
    =============================== */
@@ -179,11 +310,13 @@ main {
     min-height: 60vh;
 }
 
+
 .page {
     max-width: var(--maxw);
     margin: 24px auto;
     padding: 0 var(--space);
 }
+
 
 /* ===============================
    RĆ‰PERTOIRE : BARRE HAUTE & DISPOSITION
@@ -196,8 +329,9 @@ main {
     flex-wrap: wrap;
 }
 
+
 .pill {
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 4px 10px;
     border: 1px solid var(--border);
     border-radius: 999px;
@@ -207,6 +341,7 @@ main {
     align-items: center;
 }
 
+
 /* Layout gĆ©nĆ©ral de la zone RĆ©pertoire (sidebar + liste) */
 .repo-layout {
     display: grid;
@@ -214,11 +349,13 @@ main {
     gap: 16px;
 }
 
+
 @media (max-width: 960px) {
     .repo-layout {
         grid-template-columns: 1fr;
     }
 }
+
 
 /* Panneau latĆ©ral de filtres */
 .sidebar {
@@ -229,15 +366,18 @@ main {
     box-shadow: 0 10px 30px rgba(15, 23, 42, .05);
 }
 
+
 /* Bloc individuel de filtres */
 .facet {
     border-top: 1px dashed var(--border);
     padding: 10px 0;
 }
 
+
 .facet:first-child {
     border-top: none;
 }
+
 
 .facet h4 {
     margin: 0 0 8px;
@@ -245,15 +385,47 @@ main {
     color: #475569;
 }
 
-.facet .opt {
-    display: flex;
+
+.facet .opt,
+.facet-select-all {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
+    column-gap: 10px;
     margin: 8px 0;
     min-height: 36px;
     line-height: 1.3;
     word-break: break-word;
 }
+
+
+.facet .opt:not(.facet-select-all) {
+    padding-inline: 10px;
+}
+
+
+.facet .opt input[type="checkbox"],
+.facet-select-all input[type="checkbox"] {
+    margin: 0;
+}
+
+
+.facet-select-all {
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f1f5f9;
+    font-weight: 600;
+}
+
+
+.facet-reset {
+    margin-bottom: 16px;
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
 
 /* ===============================
    GRILLE DE CARTES (LISTE DES Ć‰LĆ‰MENTS)
@@ -263,6 +435,7 @@ main {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
 }
+
 
 .card {
     background: var(--panel);
@@ -274,21 +447,25 @@ main {
     min-height: 120px;
 }
 
+
 .card:hover {
     box-shadow: 0 14px 36px rgba(37, 99, 235, .12);
     border-color: #c7d2fe;
 }
+
 
 .card .title {
     font-style: italic;
     font-weight: 800;
 }
 
+
 .card .desc {
     color: var(--muted);
     font-size: var(--fs-sm);
     margin-top: 6px;
 }
+
 
 /* Image en haut de chaque carte (aperĆ§u de la technologie) */
 .card-thumb {
@@ -303,6 +480,7 @@ main {
     margin-bottom: 8px;
 }
 
+
 .card-thumb img {
     width: 100%;
     height: 100%;
@@ -310,12 +488,14 @@ main {
     display: block;
 }
 
+
 .card-thumb-fallback {
     font-size: var(--fs-sm);
     color: var(--muted);
     padding: 8px;
     text-align: center;
 }
+
 
 /* Barre de pagination sous la grille */
 .pagination {
@@ -326,15 +506,18 @@ main {
     margin-top: 16px;
 }
 
+
 .pagination-info {
     font-size: var(--fs-sm);
     color: var(--muted);
 }
 
+
 .pagination-btn[disabled] {
     opacity: 0.4;
     cursor: default;
 }
+
 
 /* ===============================
    FICHE DĆ‰TAILLĆ‰E (MISE EN PAGE)
@@ -346,25 +529,123 @@ main {
     box-shadow: var(--shadow);
 }
 
+
 .hero {
     padding: 22px 22px 10px;
     border-bottom: 1px solid var(--border);
 }
 
+
 .hero h2 {
     margin: 0;
-    font-size: clamp(22px, 3.2vw, 28px);
+    font-size: clamp(1.375rem, 3.2vw, 1.75rem);
     line-height: 1.15;
     font-weight: 800;
 }
+
 
 .meta {
     color: var(--muted);
 }
 
+
 .section {
     padding: 16px 22px;
 }
+
+
+.contact-card {
+    margin: 20px 22px 40px;
+    padding: 40px 24px;
+    border-radius: 12px;
+    background: #315a77;
+    color: #fff;
+}
+
+
+.contact-card h3 {
+    margin-top: 0;
+}
+
+
+.contact-card p {
+    max-width: 420px;
+    line-height: 1.6;
+}
+
+
+.contact-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+
+.about-highlight {
+    margin: 0 22px 32px;
+    padding: 24px 22px 32px;
+    border-radius: 16px;
+    background: #175b67;
+    color: #fff;
+}
+
+
+.about-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+
+.about-columns h3 {
+    margin-top: 0;
+}
+
+
+.about-columns p {
+    line-height: 1.6;
+}
+
+
+.about-team {
+    padding: 40px 22px 48px;
+    background: #165c6f;
+    color: #fff;
+}
+
+
+.about-team section {
+    max-width: 720px;
+    margin: 0 auto 32px;
+}
+
+
+.about-team section:last-child {
+    margin-bottom: 0;
+}
+
+
+.legal-card {
+    margin: 12px 0 20px;
+    padding: 18px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+
+@media (max-width: 700px) {
+    .about-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 /* Grille principale de la fiche (description + image / mĆ©tadonnĆ©es) */
 .sheet {
@@ -374,19 +655,22 @@ main {
     padding: 16px;
 }
 
+
 @media (max-width: 900px) {
     .sheet {
         grid-template-columns: 1fr;
     }
 }
 
+
 .sheet .title {
     text-align: center;
     font-style: italic;
     font-weight: 800;
-    font-size: clamp(22px, 3vw, 28px);
+    font-size: clamp(1.375rem, 3vw, 1.75rem);
     margin: 6px 0 2px;
 }
+
 
 .sheet .keywords {
     text-align: center;
@@ -394,6 +678,7 @@ main {
     font-size: var(--fs-sm);
     margin-bottom: 10px;
 }
+
 
 .sheet .line {
     display: flex;
@@ -404,15 +689,18 @@ main {
     margin: 12px 0 10px;
 }
 
+
 .sheet .label {
     color: #334155;
 }
 
+
 /* Bloc texte de description principale */
 .sheet .desc h4 {
     margin: 0 0 8px;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
+
 
 .sheet .descbox {
     min-height: 200px;
@@ -423,6 +711,7 @@ main {
     background: var(--panel);
     line-height: 1.5;
 }
+
 
 /* Bloc image + lĆ©gende */
 .sheet .imagebox {
@@ -435,6 +724,7 @@ main {
     overflow: hidden;
 }
 
+
 .sheet .imagebox img {
     width: 100%;
     height: auto;
@@ -442,17 +732,20 @@ main {
     object-fit: cover;
 }
 
+
 .sheet .imgcap {
     color: #a0a7b2;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: right;
     margin-top: 6px;
 }
+
 
 /* Liste de mĆ©tadonnĆ©es (structure, site, langue, etc.) */
 .sheet dl {
     margin: 0;
 }
+
 
 .sheet dt {
     float: left;
@@ -461,14 +754,17 @@ main {
     color: #5b6676;
 }
 
+
 .sheet dd {
     margin-left: 130px;
 }
+
 
 .sheet dd a {
     color: #2563eb;
     text-decoration: underline;
 }
+
 
 /* ===============================
    COMPORTEMENT SPĆ‰CIFIQUE Ć€ Lā€™ACCUEIL
@@ -479,6 +775,7 @@ body.home #q {
     display: none !important;
 }
 
+
 /* Section hĆ©ro de lā€™accueil */
 .home-hero {
     display: grid;
@@ -487,22 +784,26 @@ body.home #q {
     padding: 24px;
 }
 
+
 .home-search {
     max-width: 720px;
     width: 100%;
     text-align: center;
 }
 
+
 .home-search h2 {
-    font-size: clamp(24px, 3.5vw, 36px);
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
     margin: 0 0 12px;
     font-weight: 800;
 }
+
 
 .home-search p {
     color: #667085;
     margin: 0 0 18px;
 }
+
 
 /* Barre de recherche centrale (accueil) */
 .home-search .search-wrap {
@@ -511,19 +812,22 @@ body.home #q {
     align-items: center;
 }
 
+
 .home-search input[type="search"] {
     flex: 1;
     padding: 14px 16px;
     border: 1px solid var(--border);
     border-radius: 14px;
     background: #fff;
-    font-size: 16px;
+    font-size: 1rem;
 }
+
 
 .home-search button {
     padding: 14px 16px;
     border-radius: 14px;
 }
+
 
 /* ===============================
    RĆ‰PERTOIRE : FILTRES REPLIABLES
@@ -541,23 +845,28 @@ body.home #q {
     transition: background .2s ease;
 }
 
+
 .filters-toggle:hover {
     background: #e2e8f0;
 }
+
 
 /* Variation de layout selon que la sidebar est visible ou non */
 .repo-layout.with-filters {
     grid-template-columns: var(--sidebar) 1fr;
 }
 
+
 .repo-layout.no-filters {
     grid-template-columns: 1fr;
 }
+
 
 /* Sidebar masquĆ©e */
 .sidebar.hidden {
     display: none;
 }
+
 
 /* ===============================
    PIED DE PAGE (NOUVELLE VERSION)
@@ -573,61 +882,86 @@ body.home #q {
     margin-top: 50px;
 }
 
+
 /* Colonnes du footer */
 .footer-section h3 {
     margin-bottom: 12px;
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: bold;
 }
 
+
 .footer-section p,
 .footer-section ul {
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.5;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
+
 .footer-section ul li {
     margin-bottom: 6px;
 }
+
 
 .footer-section ul li a {
     color: #e8f4fb;
     text-decoration: none;
 }
 
+
 .footer-section ul li a:hover {
     text-decoration: underline;
 }
 
-/* Lien Ā« retour en haut Ā» dans le footer */
+
+/* Bouton flottant de retour haut */
 .footer-top-link {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 100;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: var(--fs-sm);
     text-decoration: underline;
-    margin-top: 12px;
     color: #f9fafb;
     padding: 8px 14px;
     border-radius: 999px;
     border: 1px solid rgba(249, 250, 251, 0.9);
-    background: transparent;
+    background: #2a78a6;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity .2s ease, visibility .2s ease, transform .2s ease, background .2s ease;
 }
 
-.footer-top-link:hover {
-    background: rgba(249, 250, 251, 0.12);
+
+.footer-top-link.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
 }
+
+
+.footer-top-link:hover {
+    background: #3688b5;
+}
+
 
 /* Bandeau infĆ©rieur du site */
 .footer-bottom {
     text-align: center;
     margin-top: 20px;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: #4a4a4a;
 }
+
 
 /* ===============================
    MODALE Ā« SOUMETTRE UNE TECHNOLOGIE Ā»
@@ -642,9 +976,11 @@ body.home #q {
     z-index: 200;
 }
 
+
 .modal.hidden {
     display: none;
 }
+
 
 /* BoĆ®te centrale de la modale */
 .modal-box {
@@ -656,6 +992,7 @@ body.home #q {
     box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
 }
 
+
 /* Boutons de la modale */
 .modal-box button,
 #closeModal {
@@ -664,13 +1001,15 @@ body.home #q {
     color: #fff;
     border-radius: 8px;
     border: none;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
 }
+
 
 .modal-box button:hover {
     opacity: 0.95;
 }
+
 
 /* ===============================
    FORMULAIRE Ā« SOUMETTRE Ā» (VERSION ID)
@@ -682,10 +1021,12 @@ body.home #q {
     gap: 24px;
 }
 
+
 #soumettreForm h3 {
     margin-top: 30px;
     margin-bottom: 10px;
 }
+
 
 #soumettreForm label {
     display: grid;
@@ -696,25 +1037,29 @@ body.home #q {
     color: #0d1722;
 }
 
+
 #soumettreForm input,
 #soumettreForm textarea {
     width: 100%;
     padding: 10px 14px;
     border-radius: 6px;
     border: 1px solid #C8D0D8;
-    font-size: 15px;
+    font-size: 0.9375rem;
 }
+
 
 #soumettreForm textarea {
     height: 110px;
     resize: none;
 }
 
+
 /* Checkbox pleine largeur dans #soumettreForm */
 #soumettreForm label.checkbox-row {
     grid-template-columns: auto 1fr;
     align-items: center;
 }
+
 
 /* ===============================
    FORMULAIRE Ā« SOUMETTRE Ā» (VERSION .soumettre-form)
@@ -727,9 +1072,11 @@ body.home #q {
     row-gap: 16px;
 }
 
+
 .soumettre-form h3 {
     margin: 24px 0 8px;
 }
+
 
 .soumettre-form label {
     display: grid;
@@ -738,6 +1085,7 @@ body.home #q {
     align-items: center;
     font-weight: 600;
 }
+
 
 .soumettre-form input[type="text"],
 .soumettre-form input[type="url"],
@@ -751,10 +1099,12 @@ body.home #q {
     font: inherit;
 }
 
+
 .soumettre-form textarea {
     min-height: 120px;
     resize: vertical;
 }
+
 
 /* Ligne de checkbox dans la version .soumettre-form */
 .checkbox-row {
@@ -764,13 +1114,16 @@ body.home #q {
     font-weight: 400;
 }
 
+
 .checkbox-row input[type="checkbox"] {
     margin: 0;
 }
 
+
 .checkbox-row span {
     line-height: 1.4;
 }
+
 
 /* Ligne de validation (bouton envoyer) */
 .submit-row {
@@ -779,17 +1132,93 @@ body.home #q {
     margin-top: 10px;
 }
 
+
 .submit-btn {
     padding: 10px 28px;
     background: var(--accent);
     color: #fff;
     border-radius: 8px;
     border: none;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
     width: auto;
 }
 
+
 .submit-btn:hover {
     opacity: 0.95;
 }
+
+
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .filters-toggle,
+html[data-theme="dark"] .facet-select-all,
+html[data-theme="dark"] .legal-card {
+    background: #273449;
+    color: var(--ink);
+    border-color: #46546a;
+}
+
+
+html[data-theme="dark"] .facet-reset {
+    background: #334155;
+    border-color: #64748b;
+}
+
+
+html[data-theme="dark"] .btn:hover,
+html[data-theme="dark"] .filters-toggle:hover {
+    border-color: #64748b;
+    background: #334155;
+}
+
+
+html[data-theme="dark"] .navlink[aria-current="page"] {
+    background: #1e3a5f;
+    color: #bfdbfe;
+}
+
+
+html[data-theme="dark"] .facet h4,
+html[data-theme="dark"] .sheet .line,
+html[data-theme="dark"] .sheet .label,
+html[data-theme="dark"] .sheet dt {
+    color: #cbd5e1;
+}
+
+
+html[data-theme="dark"] .card-thumb,
+html[data-theme="dark"] .sheet .imagebox {
+    background: #293548;
+}
+
+
+html[data-theme="dark"] .home-search p,
+html[data-theme="dark"] .footer-bottom,
+html[data-theme="dark"] #soumettreForm label {
+    color: var(--muted);
+}
+
+
+html[data-theme="dark"] .home-search input[type="search"],
+html[data-theme="dark"] #soumettreForm input,
+html[data-theme="dark"] #soumettreForm textarea {
+    background: var(--panel);
+    color: var(--ink);
+    border-color: var(--border);
+}
+
+
+html[data-theme="dark"] .modal-box {
+    background: var(--panel);
+    color: var(--ink);
+}
+
+
+html[data-theme="dark"] .contact-button {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+
+
