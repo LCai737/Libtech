@@ -39,7 +39,7 @@
 
 
     const isUrl = (v) => /^(https?:)?\/\//i.test(String(v));
-    const isImg = (v) => /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(String(v));
+    const isImg = (v) => /^https?:\/\//i.test(String(v).trim());
 
 
     // ------------------------------------------------------------
