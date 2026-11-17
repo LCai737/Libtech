@@ -11,8 +11,7 @@
     // 1. Source des données (Google Sheets publié en CSV)
     // ------------------------------------------------------------
     const CSV_URL =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTrbhCHyINYJMEBbnl_SGBujZOOUB0rw4WnXWirV9dUF_PaktI2oVM0ubMRK6B_Xw/pub?output=csv';
-
+    'https://docs.google.com/spreadsheets/d/1m8lA4cvpCk2GdFyMoT-9e3wP8kocDtWCg8-ueLZ0Gw8/export?format=csv&gid=190357944';
 
     // ------------------------------------------------------------
     // 2. Fonctions utilitaires (sélecteurs, échappement, formats)
