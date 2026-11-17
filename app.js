@@ -810,6 +810,7 @@
                 if (currentPage > 1) {
                     currentPage--;
                     applyFiltersAndRenderCards();
+                    scrollToPageTop();
                 }
             });
         }
@@ -817,6 +818,7 @@
             nextPage.addEventListener('click', () => {
                 currentPage++;
                 applyFiltersAndRenderCards();
+                scrollToPageTop();
             });
         }
 
