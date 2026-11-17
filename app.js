@@ -862,9 +862,9 @@
 
 
         const site = Object.keys(row).find((k) =>
-            /^(site|url|lien)$/i.test(k)
+            /^(site|url|lien|liens_articles)$/i.test(k)
         )
-            ? row[Object.keys(row).find((k) => /^(site|url|lien)$/i.test(k))]
+            ? row[Object.keys(row).find((k) => /^(site|url|lien|liens_articles)$/i.test(k))]
             : '';
 
 
