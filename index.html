@@ -24,7 +24,7 @@
 
             <nav class="topnav">
                 <a class="navlink" href="#/" data-nav data-i18n="nav_home">Accueil</a>
-                <a class="navlink" href="#/repertoire" data-nav data-i18n="nav_directory">Répertoire</a>
+                <a class="navlink" href="#/repertoire" data-nav data-i18n="nav_directory">Catalogue</a>
                 <a href="#/soumettre" class="navlink" data-nav data-i18n="nav_submit">Soumettre</a>
                 <a class="navlink" href="#/a-propos" data-nav data-i18n="nav_about">À propos</a>
                 <a href="#/contact" class="navlink" data-nav data-i18n="nav_contact">Contact</a>
@@ -35,26 +35,73 @@
 
 
             <div class="toolbar">
-                <input id="q" class="select" placeholder="Rechercher…" aria-label="Recherche globale"
-                    data-i18n-placeholder="search_global" />
+                <div class="language-menu">
+                    <select id="lang" class="select" title="Langue" aria-label="Langue">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
 
 
-                <select id="lang" class="select" title="Langue" aria-label="Langue">
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                </select>
-
-
-                <select id="font" class="select font-size-select" title="Taille du texte"
-                    aria-label="Taille du texte">
-                    <option value="normal" selected>A</option>
-                    <option value="grand">A+</option>
-                    <option value="très grand">A++</option>
-                </select>
-
-
-                <button id="themeToggle" class="theme-toggle" type="button" aria-label="Activer le mode sombre"
-                    title="Activer le mode sombre">☾</button>
+                <div class="accessibility-menu">
+                    <button id="accessibilityToggle" class="accessibility-toggle" type="button"
+                        aria-expanded="false" aria-controls="accessibilityPanel" data-i18n="accessibility">
+                        Accessibilité
+                    </button>
+                    <section id="accessibilityPanel" class="accessibility-panel" aria-labelledby="accessibilityTitle" hidden>
+                        <h2 id="accessibilityTitle" data-i18n="accessibility">Accessibilité</h2>
+                        <div class="accessibility-setting">
+                            <label for="font" data-i18n="text_size">Taille du texte</label>
+                            <div class="accessibility-actions">
+                                <select id="font" class="select font-size-select" aria-label="Taille du texte">
+                                    <option value="normal" selected>A</option>
+                                    <option value="grand">A+</option>
+                                    <option value="très grand">A++</option>
+                                </select>
+                                <button id="resetAccessibility" class="accessibility-button" type="button"
+                                    data-i18n="reset_settings">Réinitialiser les réglages</button>
+                            </div>
+                        </div>
+                        <div class="accessibility-setting">
+                            <h3 data-i18n="theme_color">Couleur du thème</h3>
+                            <button id="themeToggle" class="accessibility-button theme-toggle" type="button"
+                                aria-label="Activer le mode nuit" title="Activer le mode nuit">
+                                <span aria-hidden="true">☾</span>
+                                <span id="themeToggleLabel" data-i18n="theme_night">Mode nuit</span>
+                            </button>
+                        </div>
+                        <div class="accessibility-setting">
+                            <h3 data-i18n="voice_reading">Lecture vocale</h3>
+                            <div class="accessibility-actions">
+                                <button id="speakSelection" class="accessibility-button" type="button"
+                                    data-i18n="selection">Sélection</button>
+                                <button id="speakPage" class="accessibility-button" type="button"
+                                    data-i18n="page">Page</button>
+                                <button id="stopSpeech" class="accessibility-button" type="button"
+                                    data-i18n="stop">Stop</button>
+                            </div>
+                            <div class="accessibility-subsetting">
+                                <label for="speechVoice" data-i18n="voice">Voix</label>
+                                <select id="speechVoice" class="select">
+                                    <option value="" data-i18n="default_voice">Système par défaut</option>
+                                </select>
+                            </div>
+                            <div class="accessibility-subsetting">
+                                <span data-i18n="speed">Vitesse</span>
+                                <div class="accessibility-actions" role="group" data-i18n-aria-label="speed"
+                                    aria-label="Vitesse">
+                                    <button class="accessibility-button speech-rate" type="button" data-rate="1"
+                                        aria-pressed="true">x1</button>
+                                    <button class="accessibility-button speech-rate" type="button" data-rate="1.5"
+                                        aria-pressed="false">x1.5</button>
+                                    <button class="accessibility-button speech-rate" type="button" data-rate="2"
+                                        aria-pressed="false">x2</button>
+                                </div>
+                            </div>
+                            <p id="speechStatus" class="accessibility-status" role="status" aria-live="polite"></p>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </header>
@@ -90,7 +137,7 @@
             <ul>
                 <li><a href="#/" data-i18n="nav_home">Accueil</a></li>
                 <li><a href="#/soumettre" data-i18n="nav_submit">Soumettre</a></li>
-                <li><a href="#/repertoire" data-i18n="nav_directory">Répertoire</a></li>
+                <li><a href="#/repertoire" data-i18n="nav_directory">Catalogue</a></li>
                 <li><a href="#/a-propos" data-i18n="nav_about">À propos</a></li>
                 <li><a href="#/contact" data-i18n="footer_contact">Nous contacter</a></li>
             </ul>
@@ -98,7 +145,7 @@
     </footer>
 
 
-    <div class="footer-bottom">© 2025 LibTech — Université de Bordeaux</div>
+    <div class="footer-bottom">© 2026 LibTech — Université de Bordeaux</div>
 
 
     <a class="footer-top-link" href="#top" data-i18n="back_to_top" aria-label="Retour haut" aria-hidden="true" tabindex="-1">
@@ -107,19 +154,20 @@
 
 
     <template id="view-home">
-        <section class="page">
-            <div class="home-hero">
-                <div class="home-search">
-                    <h2 data-lang="fr">La plateforme de référence pour les technologies d'assistance</h2>
-                    <h2 data-lang="en">The reference platform for assistive technologies</h2>
+        <section class="home-page">
+            <div class="home-search">
+                <form id="homeSearchForm" class="search-wrap" role="search">
+                    <input id="homeSearchInput" type="search" data-placeholder-fr="Rechercher une technologie" data-placeholder-en="Search for a technology" autocomplete="off">
+                    <button class="btn" type="submit"><span data-lang="fr">Rechercher</span><span data-lang="en">Search</span></button>
+                </form>
+            </div>
+            <figure class="home-visual">
+                <img src="images/home-campus.jpg" alt="" data-alt-fr="Bâtiment de l’Université de Bordeaux" data-alt-en="University of Bordeaux building">
+                <figcaption class="home-description">
                     <p data-lang="fr">LibTech est une plateforme collaborative dédiée aux technologies d’assistance, développée dans le cadre du Master TECH de l’Université de Bordeaux. Elle vise à rendre plus accessibles les solutions d’assistance existantes en proposant un répertoire clair, actualisé et pensé pour tous.</p>
                     <p data-lang="en">LibTech is a collaborative platform dedicated to assistive technologies, developed within the TECH Master at the University of Bordeaux. It aims to make existing assistive solutions more accessible by offering a clear, up-to-date directory designed for everyone.</p>
-                    <form id="homeSearchForm" class="search-wrap" role="search">
-                        <input id="homeSearchInput" type="search" data-placeholder-fr="Rechercher une technologie d'assistance..." data-placeholder-en="Search for an assistive technology..." autocomplete="off">
-                        <button class="btn" type="submit"><span data-lang="fr">Rechercher</span><span data-lang="en">Search</span></button>
-                    </form>
-                </div>
-            </div>
+                </figcaption>
+            </figure>
         </section>
     </template>
 
@@ -234,8 +282,8 @@
         <section class="page article">
             <div class="hero"><h2><span data-lang="fr">Plan du site</span><span data-lang="en">Site map</span></h2></div>
             <div class="section">
-                <ul data-lang="fr"><li><a href="#/">Accueil</a></li><li><a href="#/repertoire">Répertoire</a></li><li><a href="#/soumettre">Soumettre une technologie</a></li><li><a href="#/contact">Contact</a></li><li><a href="#/a-propos">À propos</a></li></ul>
-                <ul data-lang="en"><li><a href="#/">Home</a></li><li><a href="#/repertoire">Directory</a></li><li><a href="#/soumettre">Submit a technology</a></li><li><a href="#/contact">Contact</a></li><li><a href="#/a-propos">About</a></li></ul>
+                <ul data-lang="fr"><li><a href="#/">Accueil</a></li><li><a href="#/repertoire">Catalogue</a></li><li><a href="#/soumettre">Soumettre une technologie</a></li><li><a href="#/contact">Contact</a></li><li><a href="#/a-propos">À propos</a></li></ul>
+                <ul data-lang="en"><li><a href="#/">Home</a></li><li><a href="#/repertoire">Catalog</a></li><li><a href="#/soumettre">Submit a technology</a></li><li><a href="#/contact">Contact</a></li><li><a href="#/a-propos">About</a></li></ul>
             </div>
         </section>
     </template>
@@ -246,7 +294,7 @@
             <div class="hero"><h2><span data-lang="fr">Mentions légales</span><span data-lang="en">Legal notice</span></h2></div>
             <div class="section">
                 <div data-lang="en">
-                    <p class="meta">LIBTECH · Directory of assistive technologies</p>
+                    <p class="meta">LIBTECH · Catalog of assistive technologies</p>
                     <p>Website: <a href="https://mael-jerez.emi.u-bordeaux.fr/libtech/" target="_blank" rel="noopener">https://mael-jerez.emi.u-bordeaux.fr/libtech/</a></p>
                     <h2>Publisher</h2><p>This site is published as part of the LIBTECH project, whose objective is to list and promote technologies and services that support inclusion and digital accessibility.</p>
                     <div class="legal-card"><p><strong>Publisher:</strong> LIBTECH</p><p><strong>Publication manager:</strong> Maël JEREZ</p><p><strong>Postal address:</strong> 351 Cours de la Libération, 33400 Talence, France<br><strong>E-mail:</strong> <a href="mailto:promom2sc@gmail.com">promom2sc@gmail.com</a></p></div>
@@ -256,7 +304,7 @@
                     <h2>Accessibility</h2><p>LIBTECH is engaged in a process aimed at promoting digital accessibility. To report a difficulty or suggest an improvement, please write to <a href="mailto:promom2sc@gmail.com">promom2sc@gmail.com</a>.</p>
                 </div>
                 <div data-lang="fr">
-                    <p class="meta">LIBTECH · Répertoire des technologies accessibles</p>
+                    <p class="meta">LIBTECH · Catalogue des technologies accessibles</p>
                     <p>Adresse du site : <a href="https://mael-jerez.emi.u-bordeaux.fr/libtech/" target="_blank" rel="noopener">https://mael-jerez.emi.u-bordeaux.fr/libtech/</a></p>
                     <h2>Éditeur du site</h2><p>Ce site est édité dans le cadre du projet LIBTECH, ayant pour objectif de recenser et valoriser des technologies et services favorisant l’inclusion et l’accessibilité numérique.</p>
                     <div class="legal-card"><p><strong>Éditeur :</strong> LIBTECH</p><p><strong>Responsable de publication :</strong> Maël JEREZ</p><p><strong>Adresse postale :</strong> 351 Cours de la Libération, 33400 Talence, France<br><strong>E-mail :</strong> <a href="mailto:promom2sc@gmail.com">promom2sc@gmail.com</a></p></div>
@@ -308,7 +356,7 @@
             </div>
         </section>
     </template>
-    <script src="app.js"></script>
+    <script src="app.js?v=20261118-3"></script>
 </body>
 
 
