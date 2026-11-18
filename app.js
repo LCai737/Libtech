@@ -36,12 +36,6 @@
             .replace(/\p{Diacritic}/gu, '')
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
-// norm : minuscules + accents retirés, pour que « TSA », « tsa », « Écran » et « ecran » se comportent pareil
-    const norm = (s) =>
-        String(s ?? '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/\p{Diacritic}/gu, '');
 
 
     const isUrl = (v) => /^(https?:)?\/\//i.test(String(v));
