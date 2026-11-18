@@ -11,8 +11,7 @@
     // 1. Source des données (Google Sheets publié en CSV)
     // ------------------------------------------------------------
     const CSV_URL =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTrbhCHyINYJMEBbnl_SGBujZOOUB0rw4WnXWirV9dUF_PaktI2oVM0ubMRK6B_Xw/pub?output=csv';
-
+    'https://docs.google.com/spreadsheets/d/1m8lA4cvpCk2GdFyMoT-9e3wP8kocDtWCg8-ueLZ0Gw8/export?format=csv&gid=190357944';
 
     // ------------------------------------------------------------
     // 2. Fonctions utilitaires (sélecteurs, échappement, formats)
@@ -40,7 +39,7 @@
 
 
     const isUrl = (v) => /^(https?:)?\/\//i.test(String(v));
-    const isImg = (v) => /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(String(v));
+    const isImg = (v) => /^https?:\/\//i.test(String(v).trim());
 
 
     // ------------------------------------------------------------
@@ -756,12 +755,20 @@
 
         const q = searchQuery.toLowerCase().trim();
         const nkey = nameKey();
-
+        const descriptionHeaders = new Set(
+            headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
+        );
+        const descriptionHeader = pickHeader('description');
+        if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
 
         let list = rows.filter(matchRow);
         if (q.length >= 2) {
             list = list.filter(r =>
-                Object.values(r).some(v => String(v).toLowerCase().includes(q))
+                Object.entries(r).some(([key, value]) =>
+                    headers.includes(key) &&
+                    !descriptionHeaders.has(key) &&
+                    String(value).toLowerCase().includes(q)
+                )
             );
         }
 
@@ -976,6 +983,7 @@
                 if (currentPage > 1) {
                     currentPage--;
                     applyFiltersAndRenderCards();
+                    scrollToPageTop();
                 }
             });
         }
@@ -983,6 +991,7 @@
             nextPage.addEventListener('click', () => {
                 currentPage++;
                 applyFiltersAndRenderCards();
+                scrollToPageTop();
             });
         }
 
@@ -1030,9 +1039,9 @@
 
 
         const site = Object.keys(row).find((k) =>
-            /^(site|url|lien)$/i.test(k)
+            /^(site|url|lien|liens_articles)$/i.test(k)
         )
-            ? row[Object.keys(row).find((k) => /^(site|url|lien)$/i.test(k))]
+            ? row[Object.keys(row).find((k) => /^(site|url|lien|liens_articles)$/i.test(k))]
             : '';
 
 
@@ -1424,6 +1433,5 @@
         await loadCSV(CSV_URL);
     })();
 })();
-
 
 
