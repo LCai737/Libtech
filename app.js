@@ -50,6 +50,9 @@
     let headers = [];
     let bySlug = new Map();
     let expandedFacets = new Set();
+    let openFacets = new Set();
+    let searchQuery = '';
+    let speechStatusKey = '';
 
 
     let currentLang = localStorage.getItem('libtechLang') === 'en' ? 'en' : 'fr';
@@ -59,7 +62,7 @@
     const UI_STRINGS = {
         fr: {
             nav_home: 'Accueil',
-            nav_directory: 'Répertoire',
+            nav_directory: 'Catalogue',
             nav_submit: 'Soumettre',
             nav_about: 'À propos',
             nav_contact: 'Contact',
@@ -68,14 +71,32 @@
             footer_mentions: 'Mentions légales',
             footer_privacy: 'Politiques de confidentialité',
             footer_sitemap: 'Plan du site',
-            search_global: 'Rechercher…',
             back_to_top: '↑ Retour haut',
-            theme_enable_dark: 'Activer le mode sombre',
+            accessibility: 'Accessibilité',
+            text_size: 'Taille du texte',
+            reset_settings: 'Réinitialiser les réglages',
+            theme_color: 'Couleur du thème',
+            theme_night: 'Mode nuit',
+            theme_day: 'Mode clair',
+            theme_enable_dark: 'Activer le mode nuit',
             theme_enable_light: 'Activer le mode clair',
+            voice_reading: 'Lecture vocale',
+            selection: 'Sélection',
+            page: 'Page',
+            stop: 'Stop',
+            voice: 'Voix',
+            default_voice: 'Système par défaut',
+            speed: 'Vitesse',
+            speech_unsupported: 'La lecture vocale n’est pas disponible sur ce navigateur.',
+            selection_empty: 'Sélectionnez un texte à lire.',
+            page_empty: 'Aucun contenu à lire sur cette page.',
+            speech_finished: 'Lecture terminée.',
+            speech_error: 'La lecture vocale a rencontré une erreur.',
+            settings_reset: 'Réglages réinitialisés.',
         },
         en: {
             nav_home: 'Home',
-            nav_directory: 'Directory',
+            nav_directory: 'Catalog',
             nav_submit: 'Submit',
             nav_about: 'About',
             nav_contact: 'Contact',
@@ -84,14 +105,39 @@
             footer_mentions: 'Legal notice',
             footer_privacy: 'Privacy policy',
             footer_sitemap: 'Site map',
-            search_global: 'Search…',
             back_to_top: '↑ Back to top',
-            theme_enable_dark: 'Enable dark mode',
+            accessibility: 'Accessibility',
+            text_size: 'Text size',
+            reset_settings: 'Reset settings',
+            theme_color: 'Theme colour',
+            theme_night: 'Night mode',
+            theme_day: 'Light mode',
+            theme_enable_dark: 'Enable night mode',
             theme_enable_light: 'Enable light mode',
+            voice_reading: 'Read aloud',
+            selection: 'Selection',
+            page: 'Page',
+            stop: 'Stop',
+            voice: 'Voice',
+            default_voice: 'System default',
+            speed: 'Speed',
+            speech_unsupported: 'Text-to-speech is not available in this browser.',
+            selection_empty: 'Select some text to read.',
+            page_empty: 'There is no content to read on this page.',
+            speech_finished: 'Reading finished.',
+            speech_error: 'Text-to-speech encountered an error.',
+            settings_reset: 'Settings reset.',
         },
     };
 
-
+    function setSpeechStatus(key) {
+        speechStatusKey = key;
+        const speechStatus = $('#speechStatus');
+        if (speechStatus) {
+            const dict = UI_STRINGS[currentLang] || UI_STRINGS.fr;
+            speechStatus.textContent = key ? dict[key] || '' : '';
+        }
+    }
 
 
     function applyTranslations() {
@@ -111,6 +157,13 @@
             if (val) el.placeholder = val;
         });
 
+        document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
+            const key = el.getAttribute('data-i18n-aria-label');
+            const val = dict[key];
+            if (val) el.setAttribute('aria-label', val);
+        });
+
+        if (speechStatusKey) setSpeechStatus(speechStatusKey);
 
         updateThemeToggle();
     }
@@ -121,13 +174,21 @@
         const themeToggle = $('#themeToggle');
         const isDark = document.documentElement.dataset.theme === 'dark';
         const dict = UI_STRINGS[currentLang] || UI_STRINGS.fr;
-        const label = isDark ? dict.theme_enable_light : dict.theme_enable_dark;
-
+        const actionLabel = isDark ? dict.theme_enable_light : dict.theme_enable_dark;
 
         if (!themeToggle) return;
-        themeToggle.textContent = isDark ? '☀' : '☾';
-        themeToggle.setAttribute('aria-label', label);
-        themeToggle.title = label;
+        const icon = themeToggle.querySelector('[aria-hidden="true"]');
+        const modeLabel = $('#themeToggleLabel');
+        if (icon) icon.textContent = isDark ? '☀' : '☾';
+        if (modeLabel) modeLabel.textContent = isDark ? dict.theme_day : dict.theme_night;
+        themeToggle.setAttribute('aria-label', actionLabel);
+        themeToggle.title = actionLabel;
+    }
+
+    function setTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem('libtechTheme', theme);
+        updateThemeToggle();
     }
 
 
@@ -138,10 +199,35 @@
 
     $('#themeToggle')?.addEventListener('click', () => {
         const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-        document.documentElement.dataset.theme = nextTheme;
-        localStorage.setItem('libtechTheme', nextTheme);
-        updateThemeToggle();
+        setTheme(nextTheme);
     });
+
+    const accessibilityToggle = $('#accessibilityToggle');
+    const accessibilityPanel = $('#accessibilityPanel');
+    if (accessibilityToggle && accessibilityPanel) {
+        accessibilityToggle.addEventListener('click', () => {
+            const isExpanded = accessibilityToggle.getAttribute('aria-expanded') === 'true';
+            accessibilityToggle.setAttribute('aria-expanded', String(!isExpanded));
+            accessibilityPanel.hidden = isExpanded;
+            document.querySelector('header')?.classList.toggle('accessibility-open', !isExpanded);
+        });
+
+        document.addEventListener('click', (event) => {
+            if (event.target instanceof Node && !accessibilityToggle.parentElement.contains(event.target)) {
+                accessibilityToggle.setAttribute('aria-expanded', 'false');
+                accessibilityPanel.hidden = true;
+                document.querySelector('header')?.classList.remove('accessibility-open');
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape' || accessibilityPanel.hidden) return;
+            accessibilityToggle.setAttribute('aria-expanded', 'false');
+            accessibilityPanel.hidden = true;
+            document.querySelector('header')?.classList.remove('accessibility-open');
+            accessibilityToggle.focus();
+        });
+    }
 
 
     function renderTemplate(name) {
@@ -150,6 +236,8 @@
             throw new Error(`Template not found: view-${name}`);
         }
 
+        document.body.classList.remove('catalog-active');
+        $('#page').classList.remove('catalog-page');
 
         const content = template.content.cloneNode(true);
         content.querySelectorAll('[data-lang]').forEach((el) => {
@@ -159,6 +247,12 @@
             el.placeholder =
                 el.getAttribute(`data-placeholder-${currentLang}`) ||
                 el.getAttribute('data-placeholder-fr');
+        });
+
+        content.querySelectorAll('[data-alt-fr]').forEach((el) => {
+            el.alt =
+                el.getAttribute(`data-alt-${currentLang}`) ||
+                el.getAttribute('data-alt-fr');
         });
 
 
@@ -455,24 +549,23 @@
     // 7. Facettes + cartes
     // ------------------------------------------------------------
     function buildFacets() {
-        const facetRoot = $('#facetRoot');
+        const facetRoot = $('#facetList');
         if (!facetRoot) return;
 
 
         const valuesByFacet = facetValues();
         const parts = [];
         const hasActiveFilters = Array.from(activeTokens.values()).some((set) => set.size > 0);
-        const resetLabel = currentLang === 'en'
-            ? 'Reset all filters'
-            : 'Réinitialiser tous les filtres';
+        const toggleAllLabel = hasActiveFilters
+            ? (currentLang === 'en' ? 'Uncheck all' : 'Décochez tout')
+            : (currentLang === 'en' ? 'Check all' : 'Cochez tout');
 
 
-        // Cette case n'est active que lorsqu'un filtre est choisi et efface alors toutes les catégories.
         parts.push(`
         <div class="opt facet-select-all facet-reset">
           <input id="resetAllFilters" type="checkbox" data-reset-all-filters
-                 ${hasActiveFilters ? 'checked' : ''} ${hasActiveFilters ? '' : 'disabled'}>
-          <label for="resetAllFilters">${resetLabel}</label>
+                 ${hasActiveFilters ? 'checked' : ''}>
+          <label for="resetAllFilters">${toggleAllLabel}</label>
         </div>`);
 
 
@@ -482,22 +575,28 @@
 
 
             const isExpanded = expandedFacets.has(f.label);
+            const isOpen = openFacets.has(f.label);
             const max = isExpanded ? values.length : 6;
             // Cette case est cochée si la catégorie contient des sélections ; la décocher les efface toutes.
-            const selectAllLabel = currentLang === 'en' ? 'Deselect all' : 'Tout décocher';
+            const selectAllLabel = currentLang === 'en' ? 'Uncheck all' : 'Décochez tout';
 
 
             parts.push(`
         <div class="facet">
-          <h4>${esc(f.label)}</h4>
-          <div class="opt facet-select-all">
-            <input id="facet-${slug(f.label)}-all" type="checkbox"
-                   data-select-all-label="${esc(f.label)}"
-                   ${set.size ? 'checked' : ''}
-                   ${set.size ? '' : 'disabled'}>
-            <label for="facet-${slug(f.label)}-all">${selectAllLabel}</label>
-          </div>
-          ${values
+              <button class="facet-heading" type="button" data-toggle-facet-panel="${esc(f.label)}"
+                      aria-expanded="${isOpen}" aria-controls="facet-panel-${slug(f.label)}">
+                <span>${esc(f.label)}</span>
+                <span class="facet-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="facet-options" id="facet-panel-${slug(f.label)}" ${isOpen ? '' : 'hidden'}>
+                <div class="opt facet-select-all">
+                  <input id="facet-${slug(f.label)}-all" type="checkbox"
+                         data-select-all-label="${esc(f.label)}"
+                         ${set.size ? 'checked' : ''}
+                         ${set.size ? '' : 'disabled'}>
+                  <label for="facet-${slug(f.label)}-all">${selectAllLabel}</label>
+                </div>
+                ${values
                     .slice(0, max)
                     .map((val) => {
                         const id = `facet-${slug(f.label)}-${slug(val)}`;
@@ -517,6 +616,7 @@
                </button>`
                     : ''
                 }
+          </div>
         </div>`);
         }
 
@@ -528,7 +628,14 @@
             .querySelectorAll('input[type="checkbox"][data-reset-all-filters]')
             .forEach((el) => {
                 el.addEventListener('change', () => {
-                    activeTokens.forEach((set) => set.clear());
+                    activeTokens.forEach((set, label) => {
+                        set.clear();
+                        if (el.checked) {
+                            const values = valuesByFacet[label] || [];
+                            values.forEach((value) => set.add(value));
+                            if (values.length > 0) openFacets.add(label);
+                        }
+                    });
                     saveActiveTokens();
                     currentPage = 1;
                     applyFiltersAndRenderCards();
@@ -577,6 +684,17 @@
                     applyFiltersAndRenderCards();
                 });
             });
+
+        facetRoot
+            .querySelectorAll('button[data-toggle-facet-panel]')
+            .forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const label = btn.getAttribute('data-toggle-facet-panel');
+                    if (openFacets.has(label)) openFacets.delete(label);
+                    else openFacets.add(label);
+                    buildFacets();
+                });
+            });
     }
 
 
@@ -601,8 +719,7 @@
         const thumb = imageUrl && isImg(imageUrl)
             ? `<img src="${esc(imageUrl)}" alt="${esc(name)}">`
             : `<div class="card-thumb-fallback">
-                 <strong>${esc(name)}</strong><br>
-                 ${esc(needs || handicap || 'Technologie d’assistance')}
+                 ${currentLang === 'en' ? 'No illustration available' : 'Aucune image d’illustration'}
                </div>`;
 
 
@@ -620,6 +737,10 @@
             fallbackText
         )}
         </div>
+        <a class="card-more" href="#/repertoire/${esc(row.__slug)}">
+          ${currentLang === 'en' ? 'Read more' : 'Voir plus'}
+          <span class="card-more-chevron" aria-hidden="true"></span>
+        </a>
       </article>`;
     }
 
@@ -633,7 +754,7 @@
         buildFacets();
 
 
-        const q = ($('#q')?.value || '').toLowerCase().trim();
+        const q = searchQuery.toLowerCase().trim();
         const nkey = nameKey();
 
 
@@ -666,6 +787,21 @@
         grid.innerHTML = pageRows.length
             ? pageRows.map(card).join('')
             : `<div class="meta">${noResultText}</div>`;
+
+        grid.querySelectorAll('.card-thumb img').forEach((image) => {
+            const showFallback = () => {
+                if (!image.isConnected) return;
+                const fallback = document.createElement('div');
+                fallback.className = 'card-thumb-fallback';
+                fallback.textContent = currentLang === 'en'
+                    ? 'No illustration available'
+                    : 'Aucune image d’illustration';
+                image.replaceWith(fallback);
+            };
+
+            image.addEventListener('error', showFallback, { once: true });
+            if (image.complete && image.naturalWidth === 0) showFallback();
+        });
 
 
         const countOne = currentLang === 'en' ? '1 item' : '1 élément';
@@ -713,9 +849,7 @@
         setTimeout(() => $('#homeSearchInput')?.focus(), 100);
         $('#homeSearchForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const q = $('#homeSearchInput').value || '';
-            const globalInput = $('#q');
-            if (globalInput) globalInput.value = q;
+            searchQuery = $('#homeSearchInput').value || '';
             location.hash = '#/repertoire';
             setTimeout(applyFiltersAndRenderCards, 0);
         });
@@ -753,25 +887,49 @@
     }
     function viewRepertoire() {
         const isEn = currentLang === 'en';
-        // Récupère la préférence d'affichage pour garder les filtres visibles ou masqués entre deux visites.
-        const filtersVisible = localStorage.getItem('libtechFiltersVisible') === 'true';
+        const savedFiltersVisibility = localStorage.getItem('libtechFiltersVisible');
+        const filtersVisible = savedFiltersVisibility === null || savedFiltersVisibility === 'true';
 
+        FACET_LABELS.forEach((label) => {
+            if (activeTokens.get(label).size > 0) openFacets.add(label);
+            else openFacets.delete(label);
+        });
 
-        const toggleLabelShow = isEn ? '☰ Show filters' : '☰ Afficher les filtres';
-        const toggleLabelHide = isEn ? '✕ Hide filters' : '✕ Masquer les filtres';
+        document.body.classList.add('catalog-active');
+        $('#page').classList.add('catalog-page');
+
+        const toggleLabelShow = isEn ? 'Show filters' : 'Afficher les filtres';
+        const toggleLabelHide = isEn ? 'Hide filters' : 'Masquer les filtres';
         const prevText = isEn ? 'Previous' : 'Précédent';
         const nextText = isEn ? 'Next' : 'Suivant';
 
 
         $('#page').innerHTML = `
-      <section class="page">
-        <div class="repo-topbar">
-          <button id="toggleFilters" class="filters-toggle">${esc(filtersVisible ? toggleLabelHide : toggleLabelShow)}</button>
-          <span class="pill" id="count" aria-live="polite">0</span>
+      <section class="catalog-view">
+        <div class="catalog-search">
+          <form id="catalogSearchForm" class="search-wrap" role="search">
+            <input id="catalogSearchInput" type="search"
+                   aria-label="${isEn ? 'Search the catalog' : 'Rechercher dans le catalogue'}"
+                   placeholder="${isEn ? 'Search for a technology' : 'Rechercher une technologie'}"
+                   value="${esc(searchQuery)}" autocomplete="off">
+            <button class="btn" type="submit">${isEn ? 'Search' : 'Rechercher'}</button>
+          </form>
         </div>
-        <div class="repo-layout ${filtersVisible ? 'with-filters' : 'no-filters'}" id="repoLayout">
-          <aside class="sidebar${filtersVisible ? '' : ' hidden'}" id="facetRoot" aria-label="Filtres"></aside>
-          <div>
+        <div class="repo-layout with-filters" id="repoLayout">
+          <aside class="sidebar" aria-label="${isEn ? 'Filters' : 'Filtres'}">
+            <div class="sidebar-heading">
+              <h2>${isEn ? 'Filters' : 'Filtres'}</h2>
+              <button id="toggleFilters" class="filters-toggle" type="button"
+                      aria-label="${esc(filtersVisible ? toggleLabelHide : toggleLabelShow)}"
+                      title="${esc(filtersVisible ? toggleLabelHide : toggleLabelShow)}"
+                      aria-expanded="${filtersVisible}">
+                <span class="filter-toggle-chevron" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="facetList" ${filtersVisible ? '' : 'hidden'}></div>
+          </aside>
+          <div class="results-column">
+            <span class="sr-only" id="count" aria-live="polite">0</span>
             <div class="grid" id="gridRoot"></div>
             <div class="pagination" id="pagination">
               <button type="button" id="prevPage" class="btn pagination-btn">${esc(prevText)}</button>
@@ -784,19 +942,27 @@
       </section>`;
 
 
-        const repoLayout = $('#repoLayout');
-        const facetRoot = $('#facetRoot');
+        const facetList = $('#facetList');
         const toggleFilters = $('#toggleFilters');
+        const catalogSearchForm = $('#catalogSearchForm');
+        const catalogSearchInput = $('#catalogSearchInput');
+
+        catalogSearchForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            searchQuery = catalogSearchInput.value;
+            currentPage = 1;
+            applyFiltersAndRenderCards();
+        });
 
 
-        if (toggleFilters && repoLayout && facetRoot) {
+        if (toggleFilters && facetList) {
             toggleFilters.addEventListener('click', () => {
-                const isHidden = facetRoot.classList.toggle('hidden');
-                repoLayout.classList.toggle('no-filters', isHidden);
-                repoLayout.classList.toggle('with-filters', !isHidden);
-                toggleFilters.textContent = isHidden ? toggleLabelShow : toggleLabelHide;
-                // Mémorise l'état choisi afin de le restaurer après actualisation ou retour d'une fiche.
-                localStorage.setItem('libtechFiltersVisible', String(!isHidden));
+                const isVisible = facetList.hidden;
+                facetList.hidden = !isVisible;
+                toggleFilters.setAttribute('aria-expanded', String(isVisible));
+                toggleFilters.setAttribute('aria-label', isVisible ? toggleLabelHide : toggleLabelShow);
+                toggleFilters.title = isVisible ? toggleLabelHide : toggleLabelShow;
+                localStorage.setItem('libtechFiltersVisible', String(isVisible));
             });
         }
 
@@ -826,6 +992,9 @@
 
 
     function viewDetail(slugVal) {
+        document.body.classList.remove('catalog-active');
+        $('#page').classList.remove('catalog-page');
+
         const row = bySlug.get(slugVal);
         const isEn = currentLang === 'en';
 
@@ -838,10 +1007,10 @@
           </div>
           <div class="section">
             <p>${isEn
-                    ? 'The requested technology could not be found in the directory.'
-                    : 'La technologie demandée n’a pas été trouvée dans le répertoire.'
+                    ? 'The requested technology could not be found in the catalog.'
+                    : 'La technologie demandée n’a pas été trouvée dans le catalogue.'
                 }</p>
-            <p><a class="btn" href="#/repertoire">← ${isEn ? 'Back to directory' : 'Retour au répertoire'}</a></p>
+            <p><a class="btn" href="#/repertoire">← ${isEn ? 'Back to catalog' : 'Retour au catalogue'}</a></p>
           </div>
         </section>`;
             return;
@@ -881,7 +1050,7 @@
         const labelPrice = isEn ? 'Price' : 'Prix';
         const labelDate = isEn ? 'Date' : 'Date';
         const labelStructure = isEn ? 'Organization' : 'Structure';
-        const backLabel = isEn ? '← Back to directory' : '← Retour au répertoire';
+        const backLabel = isEn ? '← Back to catalog' : '← Retour au catalogue';
 
 
         $('#page').innerHTML = `
@@ -1066,32 +1235,6 @@
     // ------------------------------------------------------------
     // 10. Comportements globaux
     // ------------------------------------------------------------
-    const qInput = $('#q');
-    if (qInput) {
-        qInput.addEventListener('input', () => {
-            if (location.hash.startsWith('#/repertoire')) {
-                currentPage = 1;
-                applyFiltersAndRenderCards();
-            }
-        });
-
-
-        // Entrée lance la recherche depuis n'importe quelle page et ouvre le répertoire si nécessaire.
-        qInput.addEventListener('keydown', (e) => {
-            if (e.key !== 'Enter') return;
-
-
-            e.preventDefault();
-            if (location.hash === '#/repertoire') {
-                currentPage = 1;
-                applyFiltersAndRenderCards();
-            } else {
-                location.hash = '#/repertoire';
-            }
-        });
-    }
-
-
     const langSelect = $('#lang');
     if (langSelect) {
         langSelect.value = currentLang;
@@ -1143,6 +1286,110 @@
         });
     }
 
+    const speechVoice = $('#speechVoice');
+    const rateButtons = $$('.speech-rate');
+    let speechRate = Number(localStorage.getItem('libtechSpeechRate'));
+    if (![1, 1.5, 2].includes(speechRate)) speechRate = 1;
+
+    function updateSpeechRateButtons() {
+        rateButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', String(Number(button.dataset.rate) === speechRate));
+        });
+    }
+
+    function populateSpeechVoices() {
+        if (!speechVoice || !('speechSynthesis' in window)) return;
+        const selectedVoice = localStorage.getItem('libtechSpeechVoice') || '';
+        const defaultVoiceOption = speechVoice.querySelector('option[value=""]');
+        const voices = window.speechSynthesis.getVoices();
+        speechVoice.replaceChildren(
+            defaultVoiceOption,
+            ...voices.map((voice) => new Option(voice.name, voice.voiceURI)),
+        );
+        speechVoice.value = voices.some((voice) => voice.voiceURI === selectedVoice)
+            ? selectedVoice
+            : '';
+    }
+
+    const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    const speechButtons = [$('#speakSelection'), $('#speakPage'), $('#stopSpeech')].filter(Boolean);
+    if (!canSpeak) {
+        speechButtons.forEach((button) => {
+            button.disabled = true;
+        });
+        if (speechVoice) speechVoice.disabled = true;
+        rateButtons.forEach((button) => {
+            button.disabled = true;
+        });
+        setSpeechStatus('speech_unsupported');
+    } else {
+        populateSpeechVoices();
+        window.speechSynthesis.addEventListener('voiceschanged', populateSpeechVoices);
+
+        speechVoice?.addEventListener('change', () => {
+            localStorage.setItem('libtechSpeechVoice', speechVoice.value);
+        });
+
+        function speakText(text) {
+            const content = text.trim();
+            if (!content) return false;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(content);
+            utterance.lang = currentLang;
+            utterance.rate = speechRate;
+            const voice = window.speechSynthesis.getVoices()
+                .find((item) => item.voiceURI === speechVoice?.value);
+            if (voice) utterance.voice = voice;
+            utterance.onend = () => setSpeechStatus('speech_finished');
+            utterance.onerror = (event) => {
+                if (event.error !== 'canceled') setSpeechStatus('speech_error');
+            };
+            window.speechSynthesis.speak(utterance);
+            setSpeechStatus('');
+            return true;
+        }
+
+        $('#speakSelection')?.addEventListener('click', () => {
+            const selection = window.getSelection()?.toString() || '';
+            if (!speakText(selection)) setSpeechStatus('selection_empty');
+        });
+
+        $('#speakPage')?.addEventListener('click', () => {
+            const pageText = $('#page')?.innerText || '';
+            if (!speakText(pageText)) setSpeechStatus('page_empty');
+        });
+
+        $('#stopSpeech')?.addEventListener('click', () => {
+            window.speechSynthesis.cancel();
+            setSpeechStatus('');
+        });
+    }
+
+    rateButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            speechRate = Number(button.dataset.rate);
+            localStorage.setItem('libtechSpeechRate', String(speechRate));
+            updateSpeechRateButtons();
+        });
+    });
+    updateSpeechRateButtons();
+
+    $('#resetAccessibility')?.addEventListener('click', () => {
+        if (fontSelect) {
+            fontSelect.value = 'normal';
+            applyFontChoice('normal');
+        }
+        localStorage.setItem('libtechFontChoice', 'normal');
+        setTheme('light');
+        speechRate = 1;
+        localStorage.setItem('libtechSpeechRate', '1');
+        localStorage.removeItem('libtechSpeechVoice');
+        if (speechVoice) speechVoice.value = '';
+        if (canSpeak) window.speechSynthesis.cancel();
+        updateSpeechRateButtons();
+        setSpeechStatus('settings_reset');
+    });
 
 
 
