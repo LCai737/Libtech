@@ -753,25 +753,24 @@
         buildFacets();
 
 
-      const q = searchQuery.toLowerCase().trim();
-      const nkey = nameKey();
-      const descriptionHeaders = new Set(
-         headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
-      );
-      const descriptionHeader = pickHeader('description');
-      if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
+        const q = searchQuery.toLowerCase().trim();
+        const nkey = nameKey();
+        const descriptionHeaders = new Set(
+            headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
+        );
+        const descriptionHeader = pickHeader('description');
+        if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
 
-      let list = rows.filter(matchRow);
-      if (q.length >= 2) {
-         list = list.filter(r =>
-            Object.entries(r).some(([key, value]) =>
-                 headers.includes(key) &&
-                !descriptionHeaders.has(key) &&
-                String(value).toLowerCase().includes(q)
-        )
-    );
-}
-          
+        let list = rows.filter(matchRow);
+        if (q.length >= 2) {
+            list = list.filter(r =>
+                Object.entries(r).some(([key, value]) =>
+                    headers.includes(key) &&
+                    !descriptionHeaders.has(key) &&
+                    String(value).toLowerCase().includes(q)
+                )
+            );
+        }
 
 
         list.sort((a, b) =>
@@ -1434,5 +1433,3 @@
         await loadCSV(CSV_URL);
     })();
 })();
-
-
