@@ -36,6 +36,12 @@
             .replace(/\p{Diacritic}/gu, '')
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
+// norm : minuscules + accents retirés, pour que « TSA », « tsa », « Écran » et « ecran » se comportent pareil
+    const norm = (s) =>
+        String(s ?? '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '');
 
 
     const isUrl = (v) => /^(https?:)?\/\//i.test(String(v));
@@ -753,24 +759,24 @@
         buildFacets();
 
 
-        const q = searchQuery.toLowerCase().trim();
-        const nkey = nameKey();
-        const descriptionHeaders = new Set(
-            headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
-        );
-        const descriptionHeader = pickHeader('description');
-        if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
+       const q = norm(searchQuery).trim();
+       const nkey = nameKey();
 
-        let list = rows.filter(matchRow);
-        if (q.length >= 2) {
-            list = list.filter(r =>
-                Object.entries(r).some(([key, value]) =>
-                    headers.includes(key) &&
-                    !descriptionHeaders.has(key) &&
-                    String(value).toLowerCase().includes(q)
-                )
-            );
-        }
+      // Colonnes ignorées par la recherche : identifiant, liens, adresses d'images
+       const SEARCH_EXCLUDED = /^(id[_ ]?tech|liens?[_ ]?articles?|site|url|lien|image(_[a-z]{2})?)$/i;
+       const searchHeaders = headers.filter((h) => !SEARCH_EXCLUDED.test(h));
+
+       let list = rows.filter(matchRow);
+       if (q.length >= 2) {
+          const words = q.split(/\s+/);   // « lecteur ecran » devient ['lecteur', 'ecran']
+          list = list.filter((r) => {
+              // Texte de toutes les colonnes retenues, sans accents ni majuscules
+              const haystack = norm(searchHeaders.map((h) => r[h]).join(' '));
+              return words.every((w) => haystack.includes(w));   // chaque mot doit être présent
+    });
+  }
+}
+          
 
 
         list.sort((a, b) =>
