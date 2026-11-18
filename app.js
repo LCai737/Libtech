@@ -759,22 +759,23 @@
         buildFacets();
 
 
-       const q = norm(searchQuery).trim();
-       const nkey = nameKey();
+      const q = searchQuery.toLowerCase().trim();
+      const nkey = nameKey();
+      const descriptionHeaders = new Set(
+         headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
+      );
+      const descriptionHeader = pickHeader('description');
+      if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
 
-      // Colonnes ignorées par la recherche : identifiant, liens, adresses d'images
-       const SEARCH_EXCLUDED = /^(id[_ ]?tech|liens?[_ ]?articles?|site|url|lien|image(_[a-z]{2})?)$/i;
-       const searchHeaders = headers.filter((h) => !SEARCH_EXCLUDED.test(h));
-
-       let list = rows.filter(matchRow);
-       if (q.length >= 2) {
-          const words = q.split(/\s+/);   // « lecteur ecran » devient ['lecteur', 'ecran']
-          list = list.filter((r) => {
-              // Texte de toutes les colonnes retenues, sans accents ni majuscules
-              const haystack = norm(searchHeaders.map((h) => r[h]).join(' '));
-              return words.every((w) => haystack.includes(w));   // chaque mot doit être présent
-    });
-  }
+      let list = rows.filter(matchRow);
+      if (q.length >= 2) {
+         list = list.filter(r =>
+            Object.entries(r).some(([key, value]) =>
+                 headers.includes(key) &&
+                !descriptionHeaders.has(key) &&
+                String(value).toLowerCase().includes(q)
+        )
+    );
 }
           
 
