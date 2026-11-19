@@ -8,7 +8,7 @@
     <title>LibTech</title>
     <meta name="description" content="LibTech" />
     <link rel="icon" href="images/logo.png" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=15" />
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 
@@ -112,7 +112,7 @@
     </main>
 
 
-    <footer class="footer" style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;padding:20px 0;">
+    <footer class="footer">
 
 
         <div class="footer-section">
@@ -155,46 +155,80 @@
 
     <template id="view-home">
         <section class="home-page">
-            <div class="home-search">
-                <form id="homeSearchForm" class="search-wrap" role="search">
-                    <input id="homeSearchInput" type="search" data-placeholder-fr="Rechercher une technologie" data-placeholder-en="Search for a technology" autocomplete="off">
-                    <button class="btn" type="submit"><span data-lang="fr">Rechercher</span><span data-lang="en">Search</span></button>
-                </form>
+            <div class="home-hero">
+                <img class="home-background" src="images/home-campus.jpg" alt="" data-alt-fr="Bâtiment de l’Université de Bordeaux" data-alt-en="University of Bordeaux building">
+                <div class="home-content">
+                    <div class="home-description">
+                        <p data-lang="fr">LibTech est une plateforme collaborative dédiée aux technologies d’assistance, développée dans le cadre du Master TECH de l’Université de Bordeaux. Elle vise à rendre plus accessibles les solutions d’assistance existantes en proposant un répertoire clair, actualisé et pensé pour tous.</p>
+                        <p data-lang="en">LibTech is a collaborative platform dedicated to assistive technologies, developed within the TECH Master at the University of Bordeaux. It aims to make existing assistive solutions more accessible by offering a clear, up-to-date directory designed for everyone.</p>
+                    </div>
+                    <div class="home-search">
+                        <form id="homeSearchForm" class="search-wrap" role="search">
+                            <input id="homeSearchInput" type="search" data-placeholder-fr="Rechercher une technologie" data-placeholder-en="Search for a technology" autocomplete="off">
+                            <button class="btn" type="submit"><span data-lang="fr">Rechercher</span><span data-lang="en">Search</span></button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <figure class="home-visual">
-                <img src="images/home-campus.jpg" alt="" data-alt-fr="Bâtiment de l’Université de Bordeaux" data-alt-en="University of Bordeaux building">
-                <figcaption class="home-description">
-                    <p data-lang="fr">LibTech est une plateforme collaborative dédiée aux technologies d’assistance, développée dans le cadre du Master TECH de l’Université de Bordeaux. Elle vise à rendre plus accessibles les solutions d’assistance existantes en proposant un répertoire clair, actualisé et pensé pour tous.</p>
-                    <p data-lang="en">LibTech is a collaborative platform dedicated to assistive technologies, developed within the TECH Master at the University of Bordeaux. It aims to make existing assistive solutions more accessible by offering a clear, up-to-date directory designed for everyone.</p>
-                </figcaption>
-            </figure>
         </section>
     </template>
 
 
     <template id="view-contact">
-        <section class="page article">
+        <section class="page article contact-page">
             <div class="hero">
                 <h2 data-lang="fr">Contact</h2>
                 <h2 data-lang="en">Contact</h2>
             </div>
-            <div class="section">
-                <p data-lang="fr">Où que vous soyez, si vous avez une question sur LibTech, une suggestion de technologie d’assistance ou une correction à proposer, n’hésitez pas à nous écrire. Nous serons ravis d’échanger avec vous.</p>
-                <p data-lang="en">Wherever you are, if you have a question about LibTech, a suggestion for an assistive technology or a correction to propose, feel free to contact us. We will be happy to hear from you.</p>
-            </div>
-            <div class="contact-card">
-                <h3 data-lang="fr">Contact</h3>
-                <h3 data-lang="en">Contact</h3>
-                <p data-lang="fr">Nous vous invitons à nous contacter par e-mail en utilisant le bouton ci-dessous. L’équipe LibTech vous répondra dans les meilleurs délais.</p>
-                <p data-lang="en">You can contact us by e-mail using the button below. The LibTech team will get back to you as soon as possible.</p>
-                <a class="contact-button" href="mailto:promom2sc@gmail.com"><span data-lang="fr">Nous écrire</span><span data-lang="en">Write to us</span></a>
-            </div>
+            <p class="contact-intro">
+                <span data-lang="fr">Des questions, une suggestion, un besoin ?<br>Écrivez-nous !</span>
+                <span data-lang="en">Questions, suggestions or a need?<br>Write to us!</span>
+            </p>
+            <form id="contactForm" class="contact-form">
+                <label>
+                    <span data-lang="fr">Nom / Entreprise*</span>
+                    <span data-lang="en">Name / Company*</span>
+                    <input type="text" name="name" autocomplete="name" required>
+                </label>
+                <label>
+                    <span>Email*</span>
+                    <input type="email" name="email" autocomplete="email" required>
+                </label>
+                <label>
+                    <span data-lang="fr">Sujet*</span>
+                    <span data-lang="en">Subject*</span>
+                    <select name="subject" required>
+                        <option value="" selected disabled>—</option>
+                        <option value="question" data-lang="fr">Question</option>
+                        <option value="question" data-lang="en">Question</option>
+                        <option value="suggestion" data-lang="fr">Suggestion</option>
+                        <option value="suggestion" data-lang="en">Suggestion</option>
+                        <option value="correction" data-lang="fr">Correction</option>
+                        <option value="correction" data-lang="en">Correction</option>
+                        <option value="other" data-lang="fr">Autre</option>
+                        <option value="other" data-lang="en">Other</option>
+                    </select>
+                </label>
+                <label>
+                    <span data-lang="fr">Message*</span>
+                    <span data-lang="en">Message*</span>
+                    <textarea name="message" rows="3" required></textarea>
+                </label>
+                <label class="contact-consent">
+                    <input type="checkbox" name="consent" required>
+                    <span data-lang="fr">J’accepte l’utilisation de mes données pour traiter ma demande (<a href="#/confidentialite">politique de confidentialité</a>).</span>
+                    <span data-lang="en">I agree to the use of my data to process my request (<a href="#/confidentialite">privacy policy</a>).</span>
+                </label>
+                <div class="contact-submit-row">
+                    <button class="btn contact-submit" type="submit"><span data-lang="fr">Envoyer</span><span data-lang="en">Send</span></button>
+                </div>
+            </form>
         </section>
     </template>
 
 
     <template id="view-submit">
-        <section class="page article">
+        <section class="page article submit-page">
             <div class="hero">
                 <h2 data-lang="fr">Soumettre une technologie</h2>
                 <h2 data-lang="en">Submit a technology</h2>
@@ -203,7 +237,7 @@
                 <p data-lang="fr">Cette section permet de proposer une nouvelle technologie d’assistance à intégrer dans le répertoire LibTech. Remplissez le formulaire ci-dessous, notre équipe examinera votre dossier et vous répondra le plus rapidement possible.</p>
                 <p data-lang="en">Use this section to propose a new assistive technology to be added to the LibTech directory. Fill in the form below and our team will review your submission and get back to you as soon as possible.</p>
             </div>
-            <form id="soumettreForm" class="section soumettre-form">
+            <form id="soumettreForm" class="section">
                 <h3 data-lang="fr">Informations sur votre technologie</h3>
                 <h3 data-lang="en">Information about your technology</h3>
                 <label><span data-lang="fr">Nom de la technologie*</span><span data-lang="en">Name of the technology*</span><input name="tech_name" type="text" required></label>
@@ -232,7 +266,7 @@
 
 
     <template id="view-about">
-        <section class="page article">
+        <section class="page article about-page">
             <div class="hero"><h2><span data-lang="fr">À propos</span><span data-lang="en">About</span></h2></div>
             <div class="section">
                 <p data-lang="fr">LibTech est une plateforme collaborative dédiée aux technologies d’assistance, développée dans le cadre du Master TECH de l’Université de Bordeaux. Elle vise à rendre plus accessibles les solutions d’assistance existantes en proposant un répertoire clair, actualisé et pensé pour tous.</p>
@@ -241,38 +275,40 @@
             <div class="about-highlight">
                 <div class="about-columns">
                     <div>
-                        <h3>Mission</h3>
+                        <h3 data-lang="fr">Missions :</h3><h3 data-lang="en">Mission:</h3>
                         <p data-lang="fr">Notre mission est de faciliter l’accès à l’information sur les technologies d’assistance en proposant un répertoire structuré, fiable et simple à explorer. Nous souhaitons soutenir les étudiants, professionnels, aidants et toute personne concernée par le handicap dans la découverte d’outils adaptés.</p>
                         <p data-lang="en">Our mission is to make information about assistive technologies easier to access by offering a structured, reliable and easy-to-explore directory. We aim to support students, professionals, caregivers and anyone concerned by disability in finding appropriate tools.</p>
                     </div>
                     <div>
-                        <h3>Vision</h3>
+                        <h3>Vision :</h3>
                         <p data-lang="fr">Notre vision est de construire une ressource vivante et évolutive, améliorée chaque année par les nouvelles promotions du Master TECH. Nous imaginons une plateforme ouverte, durable et inclusive, qui accompagne l’innovation numérique et la conception accessible.</p>
                         <p data-lang="en">Our vision is to build a living, evolving resource, improved each year by new cohorts of the TECH Master. We imagine an open, sustainable and inclusive platform that accompanies digital innovation and accessible design.</p>
                     </div>
                 </div>
             </div>
-            <div class="section">
-                <h3 data-lang="fr">Équipe et collaboration</h3><h3 data-lang="en">Team and collaboration</h3>
-                <p data-lang="fr">Le projet LibTech est porté par les étudiants du parcours Technologies, Ergonomie, Cognition, Handicap (TECH). Chaque promotion contribue à la mise à jour du répertoire, au design du site et à l’accessibilité des contenus. Merci aux enseignants et aux partenaires pour leur accompagnement.</p>
-                <p data-lang="en">The LibTech project is carried by students of the Technologies, Ergonomics, Cognition, Disability (TECH) track. Each cohort contributes to updating the directory, designing the site and improving content accessibility. We thank the lecturers and partners for their support.</p>
-            </div>
-            <div class="about-team">
-                <section>
-                    <h3 data-lang="fr">Équipe actuelle (Promotion 2025–2026)</h3><h3 data-lang="en">Current team (Class of 2025–2026)</h3>
-                    <p data-lang="fr">Le développement de LibTech est assuré par la Promotion 2025–2026 du Master TECH à Université de Bordeaux. Cette promotion contribue à la mise à jour du répertoire et au changement d’hébergement du site, ainsi qu’à son développement.</p>
-                    <p data-lang="en">The development of LibTech is currently ensured by the 2025–2026 cohort of the TECH Master at the University of Bordeaux. This cohort contributes to updating the directory, changing the site’s hosting and further developing the platform.</p>
-                </section>
-                <section>
-                    <h3 data-lang="fr">Équipe précédente (Promotion 2024–2025)</h3><h3 data-lang="en">Previous team (Class of 2024–2025)</h3>
-                    <p data-lang="fr">La promotion 2024–2025 a rendu LibTech fonctionnel. Nous les remercions chaleureusement pour leur contribution essentielle.</p>
-                    <p data-lang="en">The 2024–2025 cohort made LibTech operational. We warmly thank them for their essential contribution.</p>
-                </section>
-                <section>
-                    <h3 data-lang="fr">Encadrement</h3><h3 data-lang="en">Supervision</h3>
-                    <p data-lang="fr">Le projet est encadré par l’équipe pédagogique du Master TECH, avec le soutien des enseignant·e·s et partenaires professionnels.</p>
-                    <p data-lang="en">The project is supervised by the TECH Master teaching team, with the support of lecturers and professional partners.</p>
-                </section>
+            <div class="about-highlight about-team">
+                <div class="about-team-grid">
+                    <section>
+                        <h3 data-lang="fr">Équipe et collaboration</h3><h3 data-lang="en">Team and collaboration</h3>
+                        <p data-lang="fr">Le projet LibTech est porté par les étudiants du parcours Technologies, Ergonomie, Cognition, Handicap (TECH). Chaque promotion contribue à la mise à jour du répertoire, au design du site et à l’accessibilité des contenus. Merci aux enseignants et aux partenaires pour leur accompagnement.</p>
+                        <p data-lang="en">The LibTech project is carried by students of the Technologies, Ergonomics, Cognition, Disability (TECH) track. Each cohort contributes to updating the directory, designing the site and improving content accessibility. We thank the lecturers and partners for their support.</p>
+                    </section>
+                    <section>
+                        <h3 data-lang="fr">Équipe actuelle (Promotion 2025–2026)</h3><h3 data-lang="en">Current team (Class of 2025–2026)</h3>
+                        <p data-lang="fr">Le développement de LibTech est assuré par la Promotion 2025–2026 du Master TECH à Université de Bordeaux. Cette promotion contribue à la mise à jour du répertoire et au changement d’hébergement du site, ainsi qu’à son développement.</p>
+                        <p data-lang="en">The development of LibTech is currently ensured by the 2025–2026 cohort of the TECH Master at the University of Bordeaux. This cohort contributes to updating the directory, changing the site’s hosting and further developing the platform.</p>
+                    </section>
+                    <section>
+                        <h3 data-lang="fr">Encadrement</h3><h3 data-lang="en">Supervision</h3>
+                        <p data-lang="fr">Le projet est encadré par l’équipe pédagogique du Master TECH, avec le soutien des enseignant·e·s et partenaires professionnels.</p>
+                        <p data-lang="en">The project is supervised by the TECH Master teaching team, with the support of lecturers and professional partners.</p>
+                    </section>
+                    <section>
+                        <h3 data-lang="fr">Équipe précédente (Promotion 2024–2025)</h3><h3 data-lang="en">Previous team (Class of 2024–2025)</h3>
+                        <p data-lang="fr">La promotion 2024–2025 a rendu LibTech fonctionnel. Nous les remercions chaleureusement pour leur contribution essentielle.</p>
+                        <p data-lang="en">The 2024–2025 cohort made LibTech operational. We warmly thank them for their essential contribution.</p>
+                    </section>
+                </div>
             </div>
         </section>
     </template>
@@ -356,7 +392,7 @@
             </div>
         </section>
     </template>
-    <script src="app.js?v=20261118-3"></script>
+    <script src="app.js?v=20261119-4"></script>
 </body>
 
 

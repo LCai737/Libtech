@@ -38,7 +38,6 @@
             .replace(/(^-|-$)/g, '');
 
 
-    const isUrl = (v) => /^(https?:)?\/\//i.test(String(v));
     const isImg = (v) => /^https?:\/\//i.test(String(v).trim());
 
 
@@ -305,6 +304,28 @@
 
     const PAGE_SIZE = 12;
     let currentPage = 1;
+    const CATALOG_PAGE_STATE = 'libtechCatalogPage';
+
+
+    function setCatalogPage(page, pushHistory = false) {
+        currentPage = page;
+        const state = history.state && typeof history.state === 'object'
+            ? { ...history.state }
+            : {};
+        state[CATALOG_PAGE_STATE] = currentPage;
+
+        if (pushHistory) {
+            history.pushState(state, '', location.href);
+        } else {
+            history.replaceState(state, '', location.href);
+        }
+    }
+
+
+    function getCatalogPageFromHistory() {
+        const page = history.state?.[CATALOG_PAGE_STATE];
+        return Number.isInteger(page) && page > 0 ? page : 1;
+    }
 
 
     let imageHeader = null;
@@ -323,6 +344,7 @@
         disability: { base: ['Handicap'], suffix: true },
         langs: { base: ['Langue', 'Langues'], suffix: true },
         price: { base: ['Prix', 'Tarif', 'Coût', 'Cout'], suffix: true },
+        availability: { base: ['Disponibilité', 'Disponibilite', 'Availability'], suffix: true },
         location: { base: ['Localisation', 'Pays'], suffix: true },
     };
 
@@ -627,6 +649,8 @@
             .querySelectorAll('input[type="checkbox"][data-reset-all-filters]')
             .forEach((el) => {
                 el.addEventListener('change', () => {
+                    if (!el.checked) openFacets.clear();
+
                     activeTokens.forEach((set, label) => {
                         set.clear();
                         if (el.checked) {
@@ -636,7 +660,7 @@
                         }
                     });
                     saveActiveTokens();
-                    currentPage = 1;
+                    setCatalogPage(1);
                     applyFiltersAndRenderCards();
                 });
             });
@@ -653,7 +677,7 @@
                     if (!set) return;
                     set.clear();
                     saveActiveTokens();
-                    currentPage = 1;
+                    setCatalogPage(1);
                     applyFiltersAndRenderCards();
                 });
             });
@@ -666,7 +690,7 @@
                     const label = el.getAttribute('data-facet-label');
                     const value = el.getAttribute('data-facet-value');
                     toggleToken(label, value);
-                    currentPage = 1;
+                    setCatalogPage(1);
                     applyFiltersAndRenderCards();
                 });
             });
@@ -784,6 +808,9 @@
 
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1) currentPage = 1;
+        if (history.state?.[CATALOG_PAGE_STATE] !== currentPage) {
+            setCatalogPage(currentPage);
+        }
 
 
         const start = (currentPage - 1) * PAGE_SIZE;
@@ -853,7 +880,6 @@
         renderTemplate('home');
 
 
-        setTimeout(() => $('#homeSearchInput')?.focus(), 100);
         $('#homeSearchForm').addEventListener('submit', (e) => {
             e.preventDefault();
             searchQuery = $('#homeSearchInput').value || '';
@@ -865,6 +891,27 @@
 
     function viewContact() {
         renderTemplate('contact');
+        const form = $('#contactForm');
+        if (!form) return;
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const subject = form.querySelector('select[name="subject"] option:checked')?.textContent.trim() || '';
+            const labels = currentLang === 'en'
+                ? { name: 'Name / Company', email: 'Email', subject: 'Subject', message: 'Message' }
+                : { name: 'Nom / Entreprise', email: 'Email', subject: 'Sujet', message: 'Message' };
+            const body = [
+                `${labels.name}: ${formData.get('name')}`,
+                `${labels.email}: ${formData.get('email')}`,
+                `${labels.subject}: ${subject}`,
+                '',
+                `${labels.message}:`,
+                String(formData.get('message') || ''),
+            ].join('\n');
+
+            window.location.href = `mailto:promom2sc@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        });
     }
 
 
@@ -896,6 +943,7 @@
         const isEn = currentLang === 'en';
         const savedFiltersVisibility = localStorage.getItem('libtechFiltersVisible');
         const filtersVisible = savedFiltersVisibility === null || savedFiltersVisibility === 'true';
+        setCatalogPage(getCatalogPageFromHistory());
 
         FACET_LABELS.forEach((label) => {
             if (activeTokens.get(label).size > 0) openFacets.add(label);
@@ -957,7 +1005,7 @@
         catalogSearchForm?.addEventListener('submit', (event) => {
             event.preventDefault();
             searchQuery = catalogSearchInput.value;
-            currentPage = 1;
+            setCatalogPage(1);
             applyFiltersAndRenderCards();
         });
 
@@ -981,7 +1029,7 @@
         if (prevPage) {
             prevPage.addEventListener('click', () => {
                 if (currentPage > 1) {
-                    currentPage--;
+                    setCatalogPage(currentPage - 1, true);
                     applyFiltersAndRenderCards();
                     scrollToPageTop();
                 }
@@ -989,7 +1037,7 @@
         }
         if (nextPage) {
             nextPage.addEventListener('click', () => {
-                currentPage++;
+                setCatalogPage(currentPage + 1, true);
                 applyFiltersAndRenderCards();
                 scrollToPageTop();
             });
@@ -1034,6 +1082,7 @@
         const langues = pickValue(row, 'langs');
         const localisation = pickValue(row, 'location');
         const prix = pickValue(row, 'price');
+        const disponibilite = pickValue(row, 'availability');
         const structure = row['Structure'] || row['structure'] || '';
         const dateVal = row['Date'] || row['date'] || '';
 
@@ -1057,36 +1106,38 @@
         const labelLoc = isEn ? 'Location' : 'Localisation';
         const labelLang = isEn ? 'Language' : 'Langue';
         const labelPrice = isEn ? 'Price' : 'Prix';
+        const labelAvailability = isEn ? 'Availability' : 'Disponibilité';
+        const labelProductImage = isEn ? 'Product image' : 'Image du produit';
         const labelDate = isEn ? 'Date' : 'Date';
         const labelStructure = isEn ? 'Organization' : 'Structure';
-        const backLabel = isEn ? '← Back to catalog' : '← Retour au catalogue';
+        const backLabel = isEn ? 'Back to catalog' : 'Retour au catalogue';
 
 
         $('#page').innerHTML = `
-      <section class="page article">
-        <div class="sheet">
-          <div class="left">
-            <div class="title">${esc(name)}</div>
-            <div class="line">
-              <div><span class="label">${esc(labelHandicap)} :</span> ${handicap ? esc(handicap) : ''}</div>
-              <div><span class="label">${esc(labelBesoin)} :</span> ${besoin ? esc(besoin) : ''}</div>
+      <section class="page detail-page">
+        <a class="detail-back" href="#/repertoire" aria-label="${esc(backLabel)}" title="${esc(backLabel)}">
+          <span aria-hidden="true">←</span>
+        </a>
+        <article class="article detail-article">
+          <h1 class="detail-title">${esc(name)}</h1>
+          <div class="detail-facts">
+            <div class="detail-fact">
+              <span class="detail-label">${esc(labelHandicap)}</span>
+              <span>${handicap ? esc(handicap) : ''}</span>
             </div>
-            <div class="desc">
-              <h4>${esc(labelDesc)}</h4>
-              <div class="descbox">${description ? esc(description) : esc(noDesc)}</div>
+            <div class="detail-fact">
+              <span class="detail-label">${esc(labelBesoin)}</span>
+              <span>${besoin ? esc(besoin) : ''}</span>
             </div>
           </div>
 
-
-          <div class="right">
-            <div class="imagebox">
-              ${imageUrl && isImg(imageUrl)
-                ? `<img src="${esc(imageUrl)}" alt="image">`
-                : '<span>Image</span>'
-            }
-            </div>
-            <div class="imgcap">${imageCaption ? esc(imageCaption) : ''}</div>
-            <dl>
+          <div class="detail-body">
+            <div class="detail-main">
+              <section class="detail-description">
+                <h2>${esc(labelDesc)}</h2>
+                <div class="detail-descbox">${description ? esc(description) : esc(noDesc)}</div>
+              </section>
+              <dl class="detail-metadata">
               ${site
                 ? `<dt>${esc(labelSite)}</dt><dd><a href="${esc(
                     site
@@ -1100,15 +1151,24 @@
                 : ''
             }
               ${langues ? `<dt>${esc(labelLang)}</dt><dd>${esc(langues)}</dd>` : ''}
+              ${disponibilite ? `<dt>${esc(labelAvailability)}</dt><dd>${esc(disponibilite)}</dd>` : ''}
               ${prix ? `<dt>${esc(labelPrice)}</dt><dd>${esc(prix)}</dd>` : ''}
               ${dateVal ? `<dt>${esc(labelDate)}</dt><dd>${esc(dateVal)}</dd>` : ''}
               ${structure ? `<dt>${esc(labelStructure)}</dt><dd>${esc(structure)}</dd>` : ''}
-            </dl>
-            <p style="margin-top:12px">
-              <a class="btn" href="#/repertoire">${esc(backLabel)}</a>
-            </p>
+              </dl>
+            </div>
+
+            <aside class="detail-visual">
+              <div class="detail-imagebox">
+                ${imageUrl && isImg(imageUrl)
+                  ? `<img src="${esc(imageUrl)}" alt="${esc(name)}">`
+                  : `<span>${esc(labelProductImage)}</span>`
+              }
+              </div>
+              <p class="detail-image-caption">${imageCaption ? esc(imageCaption) : esc(labelProductImage)}</p>
+            </aside>
           </div>
-        </div>
+        </article>
       </section>`;
     }
 
@@ -1238,6 +1298,23 @@
     window.addEventListener('hashchange', () => {
         scrollToPageTop();
         route();
+    });
+
+
+    window.addEventListener('popstate', (event) => {
+        if (
+            !location.hash.startsWith('#/repertoire') ||
+            /^#\/repertoire\//i.test(location.hash)
+        ) {
+            return;
+        }
+
+        const page = event.state?.[CATALOG_PAGE_STATE];
+        setCatalogPage(Number.isInteger(page) && page > 0 ? page : 1);
+        if ($('#gridRoot')) {
+            applyFiltersAndRenderCards();
+            window.setTimeout(scrollToPageTop, 0);
+        }
     });
 
 
