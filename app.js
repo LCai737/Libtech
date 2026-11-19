@@ -1302,7 +1302,9 @@
 
 
         langSelect.addEventListener('change', () => {
-            currentLang = langSelect.value || 'fr';
+            const nextLang = langSelect.value || 'fr';
+            translateActiveTokens(currentLang, nextLang);   // garde les filtres cochés en les traduisant
+            currentLang = nextLang;
             localStorage.setItem('libtechLang', currentLang);
             document.documentElement.lang = currentLang;
 
