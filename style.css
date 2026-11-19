@@ -1871,15 +1871,20 @@ body.catalog-active .filters-toggle {
 body.catalog-active .filters-toggle::before {
     content: "";
     position: absolute;
-    top: 50%;
+    top: calc(50% - 2px);
     right: -6px;
     width: 20px;
     height: 20px;
     border-radius: 6px;
     background: transparent;
     transform: translateY(-50%);
-    transition: background 160ms ease;
+    transition: top 160ms ease, background 160ms ease;
     pointer-events: none;
+}
+
+
+body.catalog-active .filters-toggle[aria-expanded="true"]::before {
+    top: calc(50% + 2px);
 }
 
 
