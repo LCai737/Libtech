@@ -1243,6 +1243,8 @@ body.catalog-active .card .desc {
     min-width: 0;
     grid-area: visual;
 }
+html[data-theme="dark"] .home-description p {
+    color: #0f172a;
 
 
 .detail-imagebox {
