@@ -1372,9 +1372,6 @@
     const langSelect = $('#lang');
     if (langSelect) {
         langSelect.value = currentLang;
-        activeTokens.forEach((set) => set.clear());   // les valeurs des filtres changent avec la langue
-        saveActiveTokens();
-        currentPage = 1;
         applyTranslations();
 
 
