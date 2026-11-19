@@ -772,6 +772,8 @@
         );
         const descriptionHeader = pickHeader('description');
         if (descriptionHeader) descriptionHeaders.add(descriptionHeader);
+        // Colonnes ignorées par la recherche
+        const SEARCH_EXCLUDED = /^(ID_Tech|Liens_articles|Image|Description_image)$/i;
 
         let list = rows.filter(matchRow);
         if (q.length >= 2) {
@@ -779,6 +781,7 @@
                 Object.entries(r).some(([key, value]) =>
                     headers.includes(key) &&
                     !descriptionHeaders.has(key) &&
+                    !SEARCH_EXCLUDED.test(key) &&
                     norm(value).includes(q)
                 )
             );
