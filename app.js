@@ -425,6 +425,19 @@
         const v = h && row[h] != null ? String(row[h]).trim() : '';
         return v || '';
     }
+    function pickImageCaption(row) {
+        const localizedHeader = headers.find((h) =>
+            new RegExp(`^description[_ ]?image_${currentLang}$`, 'i').test(h)
+        );
+        const frenchHeader = headers.find((h) =>
+            /^description[_ ]?image_fr$/i.test(h)
+        );
+        const baseHeader = headers.find((h) =>
+            /^description[_ ]?image$/i.test(h)
+        );
+        const header = localizedHeader || frenchHeader || baseHeader || imageDescHeader;
+        return header && row[header] != null ? String(row[header]).trim() : '';
+    }
 
 
     const nameKey = () => pickHeader('name') || headers[0] || 'Nom';
@@ -472,7 +485,7 @@
                     // Detect image and image-description columns (once)
                     imageHeader = headers.find((h) => /^image(_fr)?$/i.test(h)) || null;
                     imageDescHeader =
-                        headers.find((h) => /^description[_ ]?image(_fr)?$/i.test(h)) || null;
+                        headers.find((h) => /^description[_ ]?image(?:_fr|_en)?$/i.test(h)) || null;
 
 
 
@@ -785,7 +798,7 @@
 
 
         const imageUrl = imageHeader ? row[imageHeader] : '';
-        const imageCaption = imageDescHeader ? row[imageDescHeader] : '';
+        const imageCaption = pickImageCaption(row);
 
 
         const fallbackText =
