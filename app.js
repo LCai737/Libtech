@@ -37,6 +37,12 @@
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
 
+    const norm = (s) =>
+        String(s ?? '')
+           .toLowerCase()
+           .normalize('NFD')
+           .replace(/\p{Diacritic}/gu, '');
+
     const normalizeSearch = (s) =>
         String(s ?? '')
             .normalize('NFD')
@@ -759,7 +765,7 @@
         buildFacets();
 
 
-        const q = normalizeSearch(searchQuery).trim();
+        const q = norm(searchQuery).trim();
         const nkey = nameKey();
         const descriptionHeaders = new Set(
             headers.filter(header => /^description(?:_[a-z]{2})?$/i.test(header))
@@ -773,7 +779,7 @@
                 Object.entries(r).some(([key, value]) =>
                     headers.includes(key) &&
                     !descriptionHeaders.has(key) &&
-                    normalizeSearch(value).includes(q)
+                    norm(value).includes(q)
                 )
             );
         }
