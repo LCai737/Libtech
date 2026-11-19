@@ -1853,6 +1853,7 @@ body.catalog-active .catalog-search button {
 
 
 body.catalog-active .filters-toggle {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: flex-end;
@@ -1867,9 +1868,42 @@ body.catalog-active .filters-toggle {
 }
 
 
+body.catalog-active .filters-toggle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: transparent;
+    transform: translateY(-50%);
+    transition: background 160ms ease;
+    pointer-events: none;
+}
+
+
+body.catalog-active .filters-toggle .filter-toggle-chevron {
+    position: relative;
+    z-index: 1;
+}
+
+
 body.catalog-active .filters-toggle:hover {
     border: 0;
+    background: transparent;
+}
+
+
+body.catalog-active .filters-toggle:hover::before,
+body.catalog-active .filters-toggle:focus-visible::before {
     background: #f1f5f9;
+}
+
+
+html[data-theme="dark"] body.catalog-active .filters-toggle:hover::before,
+html[data-theme="dark"] body.catalog-active .filters-toggle:focus-visible::before {
+    background: #334155;
 }
 
 body.catalog-active .facet-heading,
