@@ -703,13 +703,18 @@ body.catalog-active .sidebar {
 .facet .opt input[type="checkbox"],
 .facet-select-all input[type="checkbox"] {
     margin: 0;
+    width: 16px;
+    height: 16px;
+    justify-self: center;
+    align-self: center;
 }
 
 
-.facet-select-all {
+.facet-select-all,
+.facet .facet-select-all {
     width: 100%;
     margin: 0 0 12px;
-    padding: 8px 10px;
+    padding: 8px 9px 8px 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #f1f5f9;
@@ -722,16 +727,14 @@ body.catalog-active .sidebar {
 .facet-select-all input[type="checkbox"] {
     grid-column: 2;
     grid-row: 1;
-    justify-self: center;
-    align-self: center;
-    width: 16px;
-    height: 16px;
 }
 
 
 .facet-select-all label {
     grid-column: 1;
     grid-row: 1;
+    white-space: nowrap;
+    word-break: normal;
 }
 
 
