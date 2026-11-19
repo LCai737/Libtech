@@ -314,9 +314,19 @@
     let activeTokens = restoreActiveTokens();
 
 
-    const PAGE_SIZE = 12;
+    const BASE_PAGE_SIZE = 12;
+    let currentPageSize = BASE_PAGE_SIZE;
     let currentPage = 1;
     const CATALOG_PAGE_STATE = 'libtechCatalogPage';
+
+
+    function getCatalogPageSize(grid) {
+        const columns = Math.max(
+            1,
+            window.getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length
+        );
+        return Math.ceil(BASE_PAGE_SIZE / columns) * columns;
+    }
 
 
     function setCatalogPage(page, pushHistory = false) {
@@ -821,6 +831,12 @@
 
         buildFacets();
 
+        const pageSize = getCatalogPageSize(grid);
+        if (pageSize !== currentPageSize) {
+            const firstItemIndex = (currentPage - 1) * currentPageSize;
+            currentPage = Math.floor(firstItemIndex / pageSize) + 1;
+            currentPageSize = pageSize;
+        }
 
         const q = norm(searchQuery).trim();
         const nkey = nameKey();
@@ -851,7 +867,7 @@
 
 
         const totalItems = list.length;
-        const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
 
         if (currentPage > totalPages) currentPage = totalPages;
@@ -861,8 +877,8 @@
         }
 
 
-        const start = (currentPage - 1) * PAGE_SIZE;
-        const pageRows = list.slice(start, start + PAGE_SIZE);
+        const start = (currentPage - 1) * pageSize;
+        const pageRows = list.slice(start, start + pageSize);
 
 
         const noResultText = currentLang === 'en' ? 'No results.' : 'Aucun résultat.';
@@ -1094,6 +1110,18 @@
 
         applyFiltersAndRenderCards();
     }
+
+
+    let catalogResizeTimer;
+    window.addEventListener('resize', () => {
+        window.clearTimeout(catalogResizeTimer);
+        catalogResizeTimer = window.setTimeout(() => {
+            const grid = $('#gridRoot');
+            if (grid && getCatalogPageSize(grid) !== currentPageSize) {
+                applyFiltersAndRenderCards();
+            }
+        }, 120);
+    });
 
 
     function viewDetail(slugVal) {
