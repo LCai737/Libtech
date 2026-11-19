@@ -1184,7 +1184,7 @@
 
 
         const imageUrl = imageHeader ? row[imageHeader] : '';
-        const imageCaption = imageDescHeader ? row[imageDescHeader] : '';
+        const imageCaption = pickImageCaption(row);
 
 
         const labelHandicap = isEn ? 'Disability' : 'Handicap';
