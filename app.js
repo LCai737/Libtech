@@ -532,6 +532,39 @@
         localStorage.setItem('libtechActiveTokens', JSON.stringify(savedTokens));
     }
 
+    
+    // Traduit les filtres cochés d'une langue à l'autre en s'appuyant sur les lignes de la base
+    function translateActiveTokens(fromLang, toLang) {
+        // Valeurs d'une cellule dans une langue donnée, sous forme de liste
+        const readValues = (row, key, lang) => {
+            const saved = currentLang;
+            currentLang = lang;                 // change la langue le temps de la lecture
+            const v = pickValue(row, key);
+            currentLang = saved;
+            return v.split(',').map((s) => s.trim()).filter(Boolean);
+        };
+
+        const newTokens = new Map(FACET_LABELS.map((label) => [label, new Set()]));
+
+        for (const def of facetDefs()) {
+            const old = activeTokens.get(def.label);
+            if (!old || old.size === 0) continue;       // rien de coché dans ce filtre
+            const dest = newTokens.get(def.label);
+
+            for (const row of rows) {
+                const a = readValues(row, def.key, fromLang);   // ex. ['Communiquer', 'Autonomie']
+                const b = readValues(row, def.key, toLang);     // ex. ['Communicate', 'Autonomy']
+                if (a.length !== b.length) continue;            // listes non alignées : on ignore
+                a.forEach((val, i) => {
+                    if (old.has(val)) dest.add(b[i]);           // « Autonomie » coché => « Autonomy » coché
+                });
+            }
+        }
+
+        activeTokens = newTokens;
+        saveActiveTokens();
+    }
+
 
     function matchRow(row) {
         for (const [label, set] of activeTokens.entries()) {
