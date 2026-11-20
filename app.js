@@ -621,7 +621,33 @@
         activeTokens = newTokens;
         saveActiveTokens();
     }
+        // Valeurs d'une cellule (liste) dans une langue donnée, quelle que soit la langue du site
+    function valuesInLang(row, key, lang) {
+        const saved = currentLang;
+        currentLang = lang;
+        const v = pickValue(row, key);
+        currentLang = saved;
+        return v.split(',').map((s) => s.trim()).filter(Boolean);
+    }
 
+    // Vrai si la technologie est marquée « Tous publics » dans la colonne française
+    const isForAllAges = (row) => valuesInLang(row, 'age', 'fr').includes('Tous publics');
+
+    // Texte de la valeur « Tous publics » dans la langue du site (ex. « Suitable for all audiences » en anglais)
+    let allAgesCache = { rows: null, lang: null, value: 'Tous publics' };
+    function allAgesLabel() {
+        if (allAgesCache.rows === rows && allAgesCache.lang === currentLang) return allAgesCache.value;
+        let value = 'Tous publics';
+        for (const row of rows) {
+            const fr = valuesInLang(row, 'age', 'fr');
+            const i = fr.indexOf('Tous publics');
+            if (i < 0) continue;
+            const cur = valuesInLang(row, 'age', currentLang);
+            if (cur.length === fr.length) { value = cur[i]; break; }
+        }
+        allAgesCache = { rows, lang: currentLang, value };
+        return value;
+    }
 
     function matchRow(row) {
         for (const [label, set] of activeTokens.entries()) {
@@ -630,6 +656,10 @@
 
             const def = facetDefs().find((f) => f.label === label);
             if (!def) continue;
+            if (def.key === 'age') {
+                if (set.has(allAgesLabel())) continue;   // « Tous publics » coché : on affiche toutes les technologies
+                if (isForAllAges(row)) continue;         // sinon, les « Tous publics » restent visibles avec les autres âges
+            }
 
 
             const raw = pickValue(row, def.key);
