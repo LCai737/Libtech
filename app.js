@@ -657,7 +657,7 @@
             const def = facetDefs().find((f) => f.label === label);
             if (!def) continue;
             if (def.key === 'age') {
-                if (set.has(allAgesLabel())) continue;   // « Tous publics » coché : on affiche toutes les technologies
+                
                 if (isForAllAges(row)) continue;         // sinon, les « Tous publics » restent visibles avec les autres âges
             }
 
