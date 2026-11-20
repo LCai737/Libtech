@@ -279,6 +279,18 @@
         'Prix',
         'Localisation',
     ];
+    // Titres des filtres affichés selon la langue (les clés internes restent en français)
+    const FACET_TITLES_EN = {
+        'Besoin': 'Need',
+        'Technologie': 'Technology',
+        "Tranche d'âge": 'Age group',
+        'Handicap': 'Disability',
+        'Langue': 'Language',
+        'Prix': 'Price',
+        'Localisation': 'Location',
+    };
+    const facetTitle = (label) => (currentLang === 'en' ? FACET_TITLES_EN[label] || label : label);
+    
     // Restaure les choix des facettes après un rechargement, avec une sélection vide si les données enregistrées sont invalides.
     function restoreActiveTokens() {
         // Prépare une sélection vide pour chaque catégorie si aucune préférence n'est disponible.
@@ -674,7 +686,7 @@
         <div class="facet">
               <button class="facet-heading" type="button" data-toggle-facet-panel="${esc(f.label)}"
                       aria-expanded="${isOpen}" aria-controls="facet-panel-${slug(f.label)}">
-                <span>${esc(f.label)}</span>
+                ${isExpanded ? (currentLang === 'en' ? 'Show less' : 'Voir moins') : (currentLang === 'en' ? 'Show more' : 'Voir plus')}
                 <span class="facet-chevron" aria-hidden="true"></span>
               </button>
               <div class="facet-options" id="facet-panel-${slug(f.label)}" ${isOpen ? '' : 'hidden'}>
@@ -686,7 +698,7 @@
                   <label for="facet-${slug(f.label)}-all">${selectAllLabel}</label>
                 </div>
                 ${values
-                    .slice(0, max)
+                    .filter((val, i) => i < max || set.has(val))   // les valeurs cochées restent toujours visibles
                     .map((val) => {
                         const id = `facet-${slug(f.label)}-${slug(val)}`;
                         const checked = set.has(val) ? 'checked' : '';
