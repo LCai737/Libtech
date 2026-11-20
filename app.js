@@ -686,7 +686,7 @@
         <div class="facet">
               <button class="facet-heading" type="button" data-toggle-facet-panel="${esc(f.label)}"
                       aria-expanded="${isOpen}" aria-controls="facet-panel-${slug(f.label)}">
-                ${isExpanded ? (currentLang === 'en' ? 'Show less' : 'Voir moins') : (currentLang === 'en' ? 'Show more' : 'Voir plus')}
+                <span>${esc(facetTitle(f.label))}</span>
                 <span class="facet-chevron" aria-hidden="true"></span>
               </button>
               <div class="facet-options" id="facet-panel-${slug(f.label)}" ${isOpen ? '' : 'hidden'}>
@@ -713,7 +713,7 @@
                     .join('')}
           ${values.length > 6
                     ? `<button class="btn btn-sm" data-toggle-facet="${esc(f.label)}">
-                 ${isExpanded ? 'Voir moins' : 'Voir plus'}
+                ${isExpanded ? (currentLang === 'en' ? 'Show less' : 'Voir moins') : (currentLang === 'en' ? 'Show more' : 'Voir plus')}
                </button>`
                     : ''
                 }
